@@ -1,0 +1,348 @@
+<section ref={howItWorksRef} className="bg-muted py-20 sm:py-32" id="how-it-works">
+        <div className="container mx-auto px-4">
+          <motion.h2
+            initial={{ opacity: 0, y: -20 }}
+            animate={howItWorksInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
+            transition={{ duration: 0.6 }}
+            className="mb-12 text-center text-3xl font-bold"
+          >
+            How It Works
+          </motion.h2>
+          <div className="grid gap-8 md:grid-cols-2">
+            <motion.div
+              variants={slideInLeftVariants}
+              initial="hidden"
+              animate={howItWorksInView ? "visible" : "hidden"}
+              className="flex flex-col justify-center"
+            >
+              {howItWorks.map((step, index) => (
+                <motion.div
+                  key={step.title}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={howItWorksInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="mb-6 flex items-center cursor-pointer"
+                  onMouseEnter={() => setActiveStep(index)}
+                  whileHover={{ x: 5 }}
+                >
+                  <motion.div
+                    className={`mr-4 flex h-12 w-12 items-center justify-center rounded-full transition-colors duration-300 ${activeStep === index ? "bg-primary text-primary-foreground" : "bg-muted-foreground/20 text-muted-foreground"}`}
+                    animate={
+                      activeStep === index ? { scale: [1, 1.2, 1], backgroundColor: "var(--primary)" } : { scale: 1 }
+                    }
+                    transition={{ duration: 0.3 }}
+                  >
+                    <step.icon className="h-6 w-6" />
+                  </motion.div>
+                  <div>
+                    <h3 className="text-lg font-semibold">{step.title}</h3>
+                    <p className="text-sm text-muted-foreground">{step.description}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+            <motion.div
+              variants={slideInRightVariants}
+              initial="hidden"
+              animate={howItWorksInView ? "visible" : "hidden"}
+              className="relative h-[400px] overflow-hidden rounded-lg shadow-lg"
+            >
+              <AnimatePresence mode="wait">
+                {howItWorks.map(
+                  (step, index) =>
+                    activeStep === index && (
+                      <motion.div
+                        key={step.title}
+                        initial={{ opacity: 0, scale: 1.1 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.5 }}
+                        style={{
+                          backgroundImage: `url(${step.bgImage})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        }}
+                        className="absolute inset-0 flex items-center justify-center"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
+                        <motion.div
+                          className="relative z-10 text-center text-white p-6 max-w-md"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.2, duration: 0.5 }}
+                        >
+                          <motion.div
+                            className="bg-primary/20 p-4 rounded-full inline-block mb-4"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+                          >
+                            <step.icon className="h-12 w-12" />
+                          </motion.div>
+                          <motion.h4
+                            className="text-2xl font-bold mb-2"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.4, duration: 0.5 }}
+                          >
+                            {step.title}
+                          </motion.h4>
+                          <motion.p
+                            className="text-lg"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.5, duration: 0.5 }}
+                          >
+                            {step.description}
+                          </motion.p>
+                        </motion.div>
+                      </motion.div>
+                    ),
+                )}
+              </AnimatePresence>
+
+              {/* Step indicators */}
+              <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20">
+                {howItWorks.map((_, index) => (
+                  <motion.button
+                    key={index}
+                    className={`h-2 rounded-full ${activeStep === index ? "w-8 bg-primary" : "w-2 bg-white/50"}`}
+                    onClick={() => setActiveStep(index)}
+                    whileHover={{ scale: 1.2 }}
+                    animate={{ backgroundColor: activeStep === index ? "var(--primary)" : "rgba(255,255,255,0.5)" }}
+                    transition={{ duration: 0.3 }}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Technology Section */}
+      <section ref={technologyRef} className="py-20 sm:py-32">
+        <div className="container mx-auto px-4">
+          <motion.h2
+            initial={{ opacity: 0, y: -20 }}
+            animate={technologyInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
+            transition={{ duration: 0.6 }}
+            className="mb-12 text-center text-3xl font-bold"
+          >
+            Powered by Cutting-Edge Technology
+          </motion.h2>
+          <div className="grid gap-8 md:grid-cols-2">
+            <motion.div
+              variants={slideInLeftVariants}
+              initial="hidden"
+              animate={technologyInView ? "visible" : "hidden"}
+              whileHover={{ y: -5, boxShadow: "0 10px 30px rgba(0,0,0,0.1)" }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card className="h-full transition-all duration-300">
+                <CardHeader>
+                  <CardTitle>Blockchain Foundation</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="mb-4">Our platform is built on a robust blockchain infrastructure, ensuring:</p>
+                  <motion.ul
+                    className="list-inside list-disc space-y-2"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate={technologyInView ? "visible" : "hidden"}
+                  >
+                    {[
+                      "Immutable transaction records",
+                      "Decentralized data storage",
+                      "Enhanced security and transparency",
+                      "Reduced intermediary costs",
+                    ].map((item, index) => (
+                      <motion.li key={index} variants={itemVariants} custom={index}>
+                        {item}
+                      </motion.li>
+                    ))}
+                  </motion.ul>
+                </CardContent>
+              </Card>
+            </motion.div>
+            <motion.div
+              variants={slideInRightVariants}
+              initial="hidden"
+              animate={technologyInView ? "visible" : "hidden"}
+              whileHover={{ y: -5, boxShadow: "0 10px 30px rgba(0,0,0,0.1)" }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card className="h-full transition-all duration-300">
+                <CardHeader>
+                  <CardTitle>Smart Contract Integration</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="mb-4">Smart contracts automate and secure the freelancing process:</p>
+                  <motion.ul
+                    className="list-inside list-disc space-y-2"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate={technologyInView ? "visible" : "hidden"}
+                  >
+                    {[
+                      "Automatic payment releases",
+                      "Milestone-based project management",
+                      "Dispute resolution mechanisms",
+                      "Transparent fee structures",
+                    ].map((item, index) => (
+                      <motion.li key={index} variants={itemVariants} custom={index}>
+                        {item}
+                      </motion.li>
+                    ))}
+                  </motion.ul>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+
+       {/* FAQ Section */}
+      <section ref={faqRef} className="py-20 sm:py-32">
+        <div className="container mx-auto px-4">
+          <motion.h2
+            initial={{ opacity: 0, y: -20 }}
+            animate={faqInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
+            transition={{ duration: 0.6 }}
+            className="mb-12 text-center text-3xl font-bold"
+          >
+            Frequently Asked Questions
+          </motion.h2>
+          <motion.div
+            className="mx-auto max-w-3xl"
+            variants={containerVariants}
+            initial="hidden"
+            animate={faqInView ? "visible" : "hidden"}
+          >
+            {[
+              {
+                question: "How does blockchain ensure security in freelancing?",
+                answer:
+                  "Blockchain technology provides a decentralized and immutable ledger, ensuring that all transactions and agreements are securely recorded and cannot be altered. This creates a trustless environment where both freelancers and clients can collaborate with confidence, knowing that payment terms and project details are transparently and permanently stored.",
+              },
+              {
+                question: "What are the benefits of using smart contracts?",
+                answer:
+                  'Smart contracts automate the execution of agreements between freelancers and clients. They can                  "Smart contracts automate the execution of agreements between freelancers and clients. They can automatically release payments when predefined conditions are met, such as the completion of project milestones. This reduces the need for intermediaries, minimizes disputes, and ensures that both parties adhere to the agreed-upon terms.',
+              },
+              {
+                question: "How does the escrow system work?",
+                answer:
+                  "Our escrow system acts as a secure third party that holds the client's payment until the project is completed to satisfaction. When a job is agreed upon, the client deposits the payment into the escrow. The funds are only released to the freelancer once the work is approved, providing security for both parties and incentivizing quality work.",
+              },
+              {
+                question: "Is my personal and financial information safe on the platform?",
+                answer:
+                  "Yes, we prioritize the security of your data. By leveraging blockchain technology, we ensure that your personal and financial information is encrypted and stored in a decentralized manner, making it extremely difficult for unauthorized access. Additionally, we implement industry-standard security protocols to protect all communications and transactions on our platform.",
+              },
+            ].map((faq, index) => (
+              <motion.div key={index} variants={itemVariants} className="mb-4" whileHover={{ y: -2 }}>
+                <Card className="overflow-hidden transition-all duration-300">
+                  <CardHeader
+                    className="cursor-pointer"
+                    onClick={() => setActiveFeature(activeFeature === index ? -1 : index)}
+                  >
+                    <CardTitle className="flex items-center justify-between">
+                      {faq.question}
+                      <motion.div
+                        animate={{ rotate: activeFeature === index ? 180 : 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <ChevronDown className={`h-5 w-5 transform transition-transform`} />
+                      </motion.div>
+                    </CardTitle>
+                  </CardHeader>
+                  <AnimatePresence>
+                    {activeFeature === index && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <CardContent>
+                          <motion.p
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: 0.1 }}
+                          >
+                            {faq.answer}
+                          </motion.p>
+                        </CardContent>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section ref={ctaRef} className="bg-primary py-20 text-primary-foreground sm:py-32 relative overflow-hidden">
+        {/* Animated background elements */}
+        <motion.div
+          className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white/10"
+          animate={{
+            x: [50, 0, 50],
+            y: [0, 50, 0],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{ duration: 15, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-white/5 overflow-hidden"
+          animate={{
+            x: [0, 50, 0],
+            y: [50, 0, 50],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+        />
+
+        <div className=" mx-auto px-4 text-center relative z-10">
+          <motion.div variants={fadeInVariants} initial="hidden" animate={ctaInView ? "visible" : "hidden"}>
+            <motion.h2
+              className="mb-4 text-3xl font-bold"
+              initial={{ opacity: 0, y: -20 }}
+              animate={ctaInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
+              transition={{ duration: 0.6 }}
+            >
+              Ready to Transform Your Freelancing Experience?
+            </motion.h2>
+            <motion.p
+              className="mx-auto mb-8 max-w-2xl text-lg"
+              initial={{ opacity: 0 }}
+              animate={ctaInView ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              Join our decentralized marketplace today and experience the future of secure, efficient, and transparent
+              freelancing.
+            </motion.p>
+            <motion.div
+              className="flex flex-col items-center justify-center gap-4 sm:flex-row"
+              variants={containerVariants}
+              initial="hidden"
+              animate={ctaInView ? "visible" : "hidden"}
+            >
+              <motion.div variants={itemVariants} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button size="lg" variant="secondary" className="rounded-full">
+                  Find Work
+                </Button>
+              </motion.div>
+              <motion.div variants={itemVariants} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button size="lg" variant="outline" className="rounded-full border-white text-white hover:bg-white/20">
+                  Post a Job
+                </Button>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+

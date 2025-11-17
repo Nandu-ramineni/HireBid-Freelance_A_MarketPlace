@@ -1,0 +1,13 @@
+export const Get_Users_Request = "Get_Users_Request";
+export const Get_Users_Success = "Get_Users_Success";
+export const Get_Users_Failure = "Get_Users_Failure";
+export const Get_Clients_Request = "Get_Clients_Request";
+export const Get_Clients_Success = "Get_Clients_Success";
+export const Get_Clients_Failure = "Get_Clients_Failure";
+export const Get_Freelancers_Request = "Get_Freelancers_Request";
+export const Get_Freelancers_Success = "Get_Freelancers_Success";
+export const Get_Freelancers_Failure = "Get_Freelancers_Failure";
+export const Update_User_Status_Request = "Update_User_Status_Request";
+export const Update_User_Status_Success = "Update_User_Status_Success";
+export const Update_User_Status_Failure = "Update_User_Status_Failure";
+export const REFRESH_USERS_DATA = "REFRESH_USERS_DATA";
