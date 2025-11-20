@@ -1,16 +1,29 @@
 import Notification from "../models/Notification.js";
 import { publishNotification } from "../Services/notificationService.js";
 
-
 export const sendNotification = async (req, res) => {
-    const { userId, message, notificationType } = req.body;
     try {
-        await publishNotification({ userId, message, notificationType });
-        res.status(200).json({ success: true, message: 'Notification sent successfully' });
+        const { userId, message, notificationType = "in-app" } = req.body;
+
+        const notif = await Notification.create({
+            userId,
+            message,
+            notificationType,
+            audience: "single"
+        });
+
+        await publishNotification(notif); // RabbitMQ event
+
+        res.status(200).json({
+            success: true,
+            message: "Notification sent",
+            notification: notif
+        });
     } catch (error) {
-        res.status(500).json({ success: false,error: error.message });
+        res.status(500).json({ success: false, error: error.message });
     }
-}
+};
+
 
 export const getNotificationByUser = async(req,res) => {
     const { userId } = req.user;

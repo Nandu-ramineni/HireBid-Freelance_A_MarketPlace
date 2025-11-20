@@ -1,31 +1,36 @@
 import mongoose from "mongoose";
 
-
-const NotificationSchema = mongoose.Schema({
-    userId:{
+const NotificationSchema = new mongoose.Schema({
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+        ref: "User",
+        required: function () {
+            return this.audience === "single";
+        }
     },
-    message:{
+    message: {
         type: String,
         required: true,
         trim: true
     },
-    notificationType:{
+    notificationType: {
         type: String,
-        enum: ['email', 'push', 'in-app'],
-        default: 'in-app'
+        enum: ["email", "push", "in-app"],
+        default: "in-app"
     },
-    read:{
+    audience: {
+        type: String,
+        enum: ["single", "broadcast"],
+        default: "single"
+    },
+    read: {
         type: Boolean,
         default: false
     },
-    createdAt:{
+    createdAt: {
         type: Date,
         default: Date.now
     }
 });
 
-const Notification = mongoose.model('Notification', NotificationSchema);
-export default Notification;
+export default mongoose.model("Notification", NotificationSchema);
