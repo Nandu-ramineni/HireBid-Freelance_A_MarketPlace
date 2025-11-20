@@ -1,193 +1,293 @@
 "use client"
 
+import { useEffect, useState } from "react"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Database, HardDrive, Activity, Zap, Download, RefreshCw, AlertTriangle, CheckCircle } from "lucide-react"
+import {
+    Database,
+    HardDrive,
+    Activity,
+    Zap,
+    Download,
+    RefreshCw,
+    AlertTriangle,
+    CheckCircle
+} from "lucide-react"
 
-export function DatabaseManagement() {
+import {
+    ResponsiveContainer,
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    BarChart,
+    Bar,
+    Legend
+} from "recharts"
+
+export function DatabaseManagement({ dbStats, serverStats, apiLatency }) {
+    const [history, setHistory] = useState({
+        memory: [],
+        apiLatency: [],
+        dbSize: []
+    })
+
+    useEffect(() => {
+        if (!dbStats || !serverStats || !apiLatency) return
+
+        const now = new Date().toLocaleTimeString()
+
+        setHistory(prev => ({
+            memory: [
+                ...prev.memory.slice(-19),
+                {
+                    time: now,
+                    usedPercent: Number(serverStats?.memory?.usedPercent || 0)
+                }
+            ],
+            apiLatency: [
+                ...prev.apiLatency.slice(-19),
+                {
+                    time: now,
+                    avgResponse: Number(
+                        apiLatency?.averageResponseTime?.replace(" ms", "") || 0
+                    )
+                }
+            ],
+            dbSize: [
+                ...prev.dbSize.slice(-19),
+                {
+                    time: now,
+                    totalSizeMB: Number(dbStats?.totalSizeMB || 0)
+                }
+            ]
+        }))
+    }, [dbStats, serverStats, apiLatency]) // Update charts when Redux state updates
+
+    // const memoryData = history.memory
+    // const apiLatencyData = history.apiLatency
+    const dbSizeData = history.dbSize
+
+    const recentRequestsData =
+        apiLatency?.recentRequests?.map((r, i) => ({
+            id: i + 1,
+            route: r.route,
+            duration: r.duration
+        })) || []
+
+    const formatUptime = seconds => {
+        if (!seconds) return "N/A"
+        const s = Math.floor(seconds)
+        const d = Math.floor(s / 86400)
+        const h = Math.floor((s % 86400) / 3600)
+        const m = Math.floor((s % 3600) / 60)
+        return d > 0 ? `${d}d ${h}h` : `${h}h ${m}m`
+    }
+
     return (
         <div className="space-y-8">
-            {/* Header */}
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            {/* HEADER */}
+            <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-bold">Database Management</h1>
                     <p className="text-muted-foreground mt-1">
-                        Monitor database performance, manage backups, and optimize system resources.
+                        Real-time monitoring powered by your backend Admin APIs.
                     </p>
+
+                    {serverStats && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                            Uptime: <span className="font-medium">{formatUptime(serverStats.uptime)}</span>
+                        </p>
+                    )}
                 </div>
+
                 <div className="flex gap-3">
                     <Button variant="outline">
-                        <Download className="mr-2 h-4 w-4" />
-                        Backup Now
-                    </Button>
-                    <Button variant="outline">
-                        <RefreshCw className="mr-2 h-4 w-4" />
-                        Optimize
+                        <Download className="mr-2 h-4 w-4" /> Backup Now
                     </Button>
                 </div>
             </div>
 
-            {/* Database Stats */}
+            {/* CARDS */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {/* DB Size */}
                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Database Size</CardTitle>
+                    <CardHeader className="flex justify-between pb-2">
+                        <CardTitle className="text-sm">Database Size</CardTitle>
                         <Database className="h-4 w-4 text-blue-600" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">2.4 GB</div>
-                        <p className="text-xs text-muted-foreground">+12% from last month</p>
+                        <div className="text-2xl font-bold">
+                            {dbStats ? `${dbStats.totalSizeMB} MB` : "--"}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                            Collections: {dbStats?.collections}
+                        </p>
                     </CardContent>
                 </Card>
 
+                {/* Memory */}
                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Storage Usage</CardTitle>
+                    <CardHeader className="flex justify-between pb-2">
+                        <CardTitle className="text-sm">Memory Usage</CardTitle>
                         <HardDrive className="h-4 w-4 text-green-600" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">68%</div>
-                        <Progress value={68} className="mt-2" />
+                        <div className="text-2xl font-bold">{serverStats?.memory?.usedPercent}%</div>
+                        <Progress className="mt-2" value={serverStats?.memory?.usedPercent} />
                     </CardContent>
                 </Card>
 
+                {/* API Latency */}
                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Query Performance</CardTitle>
+                    <CardHeader className="flex justify-between pb-2">
+                        <CardTitle className="text-sm">API Latency</CardTitle>
                         <Zap className="h-4 w-4 text-yellow-600" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">120ms</div>
+                        <div className="text-2xl font-bold">{apiLatency?.averageResponseTime}</div>
                         <p className="text-xs text-muted-foreground">Average response time</p>
                     </CardContent>
                 </Card>
 
+                {/* Server Status */}
                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Active Connections</CardTitle>
+                    <CardHeader className="flex justify-between pb-2">
+                        <CardTitle className="text-sm">CPU Cores</CardTitle>
                         <Activity className="h-4 w-4 text-purple-600" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">45</div>
-                        <p className="text-xs text-muted-foreground">Current connections</p>
+                        <div className="text-2xl font-bold">{serverStats?.cpuCores}</div>
+                        <p className="text-xs text-muted-foreground">CPU Load Avg</p>
                     </CardContent>
                 </Card>
             </div>
 
-            {/* Database Management Tabs */}
+            {/* TABS */}
             <Tabs defaultValue="overview" className="space-y-6">
-                <TabsList className="grid w-full grid-cols-4">
+                <TabsList className="grid grid-cols-4">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
-                    <TabsTrigger value="backups">Backups</TabsTrigger>
                     <TabsTrigger value="performance">Performance</TabsTrigger>
+                    <TabsTrigger value="latency">Latency</TabsTrigger>
                     <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
                 </TabsList>
 
+                {/* OVERVIEW TAB */}
                 <TabsContent value="overview" className="space-y-6">
                     <div className="grid gap-6 lg:grid-cols-2">
+                        {/* Database Health */}
                         <Card>
                             <CardHeader>
                                 <CardTitle>Database Health</CardTitle>
-                                <CardDescription>Current system status and health metrics</CardDescription>
+                                <CardDescription>Live health metrics</CardDescription>
                             </CardHeader>
+
                             <CardContent className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm">Connection Pool</span>
-                                    <Badge variant="default" className="flex items-center gap-1">
-                                        <CheckCircle className="h-3 w-3" />
-                                        Healthy
-                                    </Badge>
+                                <div className="flex justify-between">
+                                    <span className="text-sm">Index Count</span>
+                                    <Badge>{dbStats?.indexes}</Badge>
                                 </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm">Replication Status</span>
-                                    <Badge variant="default" className="flex items-center gap-1">
-                                        <CheckCircle className="h-3 w-3" />
-                                        Active
-                                    </Badge>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm">Index Health</span>
-                                    <Badge variant="secondary" className="flex items-center gap-1">
-                                        <AlertTriangle className="h-3 w-3" />
-                                        Needs Optimization
-                                    </Badge>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm">Backup Status</span>
-                                    <Badge variant="default" className="flex items-center gap-1">
-                                        <CheckCircle className="h-3 w-3" />
-                                        Up to Date
-                                    </Badge>
+
+                                <div className="flex justify-between">
+                                    <span className="text-sm">Average Document Size</span>
+                                    <span className="font-medium">{dbStats?.avgObjSize.toFixed(1)} bytes</span>
                                 </div>
                             </CardContent>
                         </Card>
 
+                        {/* DB Size Trend */}
                         <Card>
                             <CardHeader>
-                                <CardTitle>Table Statistics</CardTitle>
-                                <CardDescription>Overview of database tables and their sizes</CardDescription>
+                                <CardTitle>Database Size Trend</CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="space-y-2">
-                                    <div className="flex justify-between text-sm">
-                                        <span>Users</span>
-                                        <span>2,847 rows (45 MB)</span>
-                                    </div>
-                                    <Progress value={25} className="h-2" />
-                                </div>
-                                <div className="space-y-2">
-                                    <div className="flex justify-between text-sm">
-                                        <span>Projects</span>
-                                        <span>1,234 rows (78 MB)</span>
-                                    </div>
-                                    <Progress value={45} className="h-2" />
-                                </div>
-                                <div className="space-y-2">
-                                    <div className="flex justify-between text-sm">
-                                        <span>Transactions</span>
-                                        <span>15,678 rows (156 MB)</span>
-                                    </div>
-                                    <Progress value={85} className="h-2" />
-                                </div>
-                                <div className="space-y-2">
-                                    <div className="flex justify-between text-sm">
-                                        <span>Messages</span>
-                                        <span>8,945 rows (23 MB)</span>
-                                    </div>
-                                    <Progress value={15} className="h-2" />
-                                </div>
+                            <CardContent className="h-64">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={dbSizeData}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="time" hide />
+                                        <YAxis />
+                                        <Tooltip />
+                                        <Line type="monotone" dataKey="totalSizeMB" stroke="currentColor" strokeWidth={2} />
+                                    </LineChart>
+                                </ResponsiveContainer>
                             </CardContent>
                         </Card>
                     </div>
                 </TabsContent>
 
-                <TabsContent value="backups" className="space-y-6">
-                    <div className="text-center py-12">
-                        <Database className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">Database Backups</h3>
-                        <p className="text-muted-foreground mb-4">Manage automated backups and restore points</p>
-                        <Button>Coming Soon</Button>
-                    </div>
-                </TabsContent>
-
+                {/* PERFORMANCE TAB */}
                 <TabsContent value="performance" className="space-y-6">
-                    <div className="text-center py-12">
-                        <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">Performance Monitoring</h3>
-                        <p className="text-muted-foreground mb-4">Real-time database performance metrics</p>
-                        <Button>Coming Soon</Button>
+                    <div className="grid gap-6 lg:grid-cols-2">
+                        {/* Memory Usage Chart */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Memory Usage Trend</CardTitle>
+                            </CardHeader>
+                            <CardContent className="h-64">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={history.memory}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="time" hide />
+                                        <YAxis unit="%" />
+                                        <Tooltip />
+                                        <Line dataKey="usedPercent" name="Used (%)" stroke="currentColor" strokeWidth={2} />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </CardContent>
+                        </Card>
+
+                        {/* API Latency Chart */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>API Response Time Trend</CardTitle>
+                            </CardHeader>
+                            <CardContent className="h-64">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={history.apiLatency}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="time" hide />
+                                        <YAxis unit="ms" />
+                                        <Tooltip />
+                                        <Line dataKey="avgResponse" stroke="currentColor" strokeWidth={2} />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </CardContent>
+                        </Card>
                     </div>
                 </TabsContent>
 
-                <TabsContent value="maintenance" className="space-y-6">
+                {/* LATENCY TAB */}
+                <TabsContent value="latency" className="space-y-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Recent API Request Duration</CardTitle>
+                        </CardHeader>
+                        <CardContent className="h-72">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={recentRequestsData}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="route" tick={{ fontSize: 10 }} />
+                                    <YAxis unit="ms" />
+                                    <Tooltip />
+                                    <Bar dataKey="duration" fill="currentColor" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                {/* MAINTENANCE TAB */}
+                <TabsContent value="maintenance">
                     <div className="text-center py-12">
                         <RefreshCw className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">Database Maintenance</h3>
-                        <p className="text-muted-foreground mb-4">Schedule maintenance tasks and optimizations</p>
-                        <Button>Coming Soon</Button>
+                        <h3 className="text-lg font-semibold mb-2">Maintenance Coming Soon</h3>
+                        <Button>Schedule Tasks</Button>
                     </div>
                 </TabsContent>
             </Tabs>

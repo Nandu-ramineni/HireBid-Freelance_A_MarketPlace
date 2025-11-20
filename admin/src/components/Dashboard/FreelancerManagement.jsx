@@ -156,6 +156,25 @@ export function FreelancersManagement({freelancers}) {
         },
     ]
 
+    const humanizeResponseTime = (hours) => {
+    const h = Math.round(hours);
+    if (h < 24) return `${h} hours`;
+    const days = Math.round(h / 24);
+    return ` ${days} days`;
+    };
+
+    const successProgressColor = (progress) => {
+        if (progress >= 75) {
+            return "bg-yellow-500";
+        }
+        if (progress >= 50) {
+            return "bg-orange-500";
+        }
+        if (progress >= 25) {
+            return "bg-red-500";
+        }
+        return "bg-gray-500";
+    }
 
     if (!freelancers || !freelancers.freelancers) {
         return (
@@ -374,8 +393,11 @@ export function FreelancersManagement({freelancers}) {
                                                 <span className="text-sm font-medium">{freelancer?.averageRating > 0 ? freelancer.averageRating : "N/A"}</span>
                                             </div>
                                             <div className="text-xs text-muted-foreground">Success Rate: {freelancer.successRate}%</div>
-                                            <Progress value={freelancer.successRate} className="h-1" />
-                                            <div className="text-xs text-muted-foreground">Response: {freelancer.responseTime}</div>
+                                            <Progress value={freelancer.successRate} className={`h-1 ${successProgressColor(freelancer.successRate)}`} />
+                                            <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                                <h1>Avg completion Time:</h1>
+                                                {humanizeResponseTime(freelancer.averageResponseTime)}
+                                            </div>
                                         </div>
                                     </TableCell>
                                     <TableCell>

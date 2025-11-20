@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Users, DollarSign,  Briefcase,  TrendingUp,  ArrowUpRight,  ArrowDownRight,  MoreHorizontal,  Eye,  Edit,  Trash2, IndianRupee,} from "lucide-react"
+import { Users, DollarSign,  Briefcase,  TrendingUp,  ArrowUpRight,  ArrowDownRight,  MoreHorizontal,  Eye,  Edit,  Trash2, IndianRupee, AlertTriangle,} from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Copy01Icon } from "hugeicons-react"
@@ -302,6 +302,27 @@ export function DashboardContent({ users, gigs }) {
 
                 {/* Quick Stats */}
                 <Card className="border-slate-200/60 dark:border-slate-800/60 bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+                    <div className="mx-4 p-4 rounded-lg border border-red-300 dark:border-red-900/40 bg-red-50 dark:bg-red-950/20 space-y-3">
+                        <div className="flex items-center gap-2">
+                            <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                            <h4 className="text-sm font-semibold text-red-700 dark:text-red-300">
+                                Force Logout All Users
+                            </h4>
+                        </div>
+
+                        <p className="text-xs text-red-600 dark:text-red-400 leading-relaxed">
+                            This action will invalidate all active user sessions and require everyone to re-login.
+                            Only use this in case of security breaches or system-wide resets.
+                        </p>
+
+                        <Button
+                            variant="destructive"
+                            className="w-full text-sm font-medium"
+                            onClick={() => console.log("Trigger global logout")}
+                        >
+                            Force Logout
+                        </Button>
+                    </div>
                     <CardHeader>
                         <CardTitle className="text-lg font-semibold">Platform Health</CardTitle>
                         <CardDescription>System performance metrics</CardDescription>

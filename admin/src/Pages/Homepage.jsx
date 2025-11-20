@@ -23,7 +23,8 @@ import AdminSignIn from '@/components/Auth/Signin';
 import useTokenValidation from '@/hooks/useTokenValidation';
 import { useDispatch, useSelector } from 'react-redux';
 import { getTotalClients, getTotalFreelancers, getTotalUsers } from '@/Redux/Actions/userAction';
-import { getGigList } from '@/Redux/Actions/gigAction';
+import { getBidsList, getGigList } from '@/Redux/Actions/gigAction';
+import { getAPILatency, getDBStats, getServerStats } from '@/Redux/Actions/dbActions';
 
 
 const queryClient = new QueryClient();
@@ -33,11 +34,17 @@ const Homepage = () => {
     const dispatch = useDispatch();
     const { users, clients, freelancers, refresh } = useSelector((state) => state.users);
     const { gigs } = useSelector((state) => state.gigs);
+    const { bids } = useSelector((state) => state.bids);
+    const { dbStats, serverStats, apiLatency } = useSelector((state) => state.db);
     useEffect(() => {
         dispatch(getTotalUsers());
         dispatch(getTotalClients());
         dispatch(getGigList());
         dispatch(getTotalFreelancers());
+        dispatch(getBidsList());
+        dispatch(getDBStats());
+        dispatch(getServerStats());
+        dispatch(getAPILatency());
     }, [dispatch, refresh]);
 
     return (
@@ -76,14 +83,14 @@ const Homepage = () => {
                                 }
                             />
                             <Route path="/projects" element={<ProjectsManagement gigs={gigs} />} />
-                            <Route path="/bids" element={<BidsManagement />} />
+                            <Route path="/bids" element={<BidsManagement bids={bids} />} />
                             <Route path="/messages" element={<MessagesManagement />} />
                             <Route path="/payments" element={<PaymentsManagement />} />
                             <Route path="/transactions" element={<TransactionsManagement />} />
                             <Route path="/reports" element={<ReportsContent />} />
                             <Route path="/notifications" element={<NotificationsManagement />} />
                             <Route path="/security" element={<SecuritySettings />} />
-                            <Route path="/database" element={<DatabaseManagement />} />
+                            <Route path="/database" element={<DatabaseManagement dbStats={dbStats} serverStats={serverStats} apiLatency={apiLatency} />} />
                             <Route path="/settings" element={<SystemSettings />} />
                         </Route>
                     </Routes>

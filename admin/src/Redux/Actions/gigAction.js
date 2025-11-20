@@ -16,3 +16,17 @@ export const getGigList = () => async (dispatch) => {
         dispatch({ type: ActionTypes.Get_GIG_LIST_FAILURE, payload: error.response.data });
     }
 }
+
+export const getBidsList = () => async (dispatch) => {
+    try {
+        dispatch({ type: ActionTypes.Get_Bids_LIST_REQUEST });
+        const response = await axios.get(`${API_URL}/v1/admin/gigs/getBids`, { 
+            headers: {
+                Authorization: `Bearer ${Cookies.get('accessToken')}`
+            }
+        });
+        dispatch({ type: ActionTypes.Get_Bids_LIST_SUCCESS, payload: response.data });
+    } catch (error) {
+        dispatch({ type: ActionTypes.Get_Bids_LIST_FAILURE, payload: error.response.data });
+    }
+}

@@ -21,177 +21,49 @@ import {
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-const bidsData = [
-    {
-        id: 1,
-        projectId: "PRJ-001",
-        projectTitle: "E-commerce Website Development",
-        freelancer: {
-            name: "Alice Johnson",
-            email: "alice@example.com",
-            avatar: "/placeholder.svg?height=40&width=40",
-            rating: 4.8,
-            completedProjects: 12,
-            successRate: 95,
-        },
-        client: {
-            name: "TechCorp Inc.",
-            email: "client@techcorp.com",
-        },
-        bidAmount: "$4,800",
-        originalBudget: "$5,000",
-        proposedTimeline: "6 weeks",
-        submittedAt: "2024-01-15T10:30:00Z",
-        status: "pending",
-        priority: "high",
-        proposal:
-            "I have extensive experience in e-commerce development with React and Node.js. I can deliver a fully functional platform with payment integration, user management, and admin dashboard.",
-        skills: ["React", "Node.js", "MongoDB", "Stripe"],
-        portfolio: ["https://example1.com", "https://example2.com"],
-        estimatedHours: 160,
-        milestones: [
-            { title: "UI/UX Design", duration: "1 week", amount: "$1,200" },
-            { title: "Frontend Development", duration: "3 weeks", amount: "$2,400" },
-            { title: "Backend & Integration", duration: "2 weeks", amount: "$1,200" },
-        ],
-    },
-    {
-        id: 2,
-        projectId: "PRJ-002",
-        projectTitle: "Mobile App UI/UX Design",
-        freelancer: {
-            name: "Bob Smith",
-            email: "bob@example.com",
-            avatar: "/placeholder.svg?height=40&width=40",
-            rating: 4.6,
-            completedProjects: 18,
-            successRate: 89,
-        },
-        client: {
-            name: "StartupXYZ",
-            email: "founder@startupxyz.com",
-        },
-        bidAmount: "$3,000",
-        originalBudget: "$3,200",
-        proposedTimeline: "4 weeks",
-        submittedAt: "2024-01-14T14:20:00Z",
-        status: "accepted",
-        priority: "medium",
-        proposal:
-            "I specialize in mobile app design with a focus on user experience. I'll create wireframes, prototypes, and final designs for both iOS and Android platforms.",
-        skills: ["Figma", "Adobe XD", "Prototyping", "User Research"],
-        portfolio: ["https://design1.com", "https://design2.com"],
-        estimatedHours: 120,
-        milestones: [
-            { title: "Research & Wireframes", duration: "1 week", amount: "$750" },
-            { title: "UI Design", duration: "2 weeks", amount: "$1,500" },
-            { title: "Prototyping & Testing", duration: "1 week", amount: "$750" },
-        ],
-    },
-    {
-        id: 3,
-        projectId: "PRJ-003",
-        projectTitle: "Content Writing for Blog",
-        freelancer: {
-            name: "Carol Davis",
-            email: "carol@example.com",
-            avatar: "/placeholder.svg?height=40&width=40",
-            rating: 4.2,
-            completedProjects: 8,
-            successRate: 92,
-        },
-        client: {
-            name: "BlogMaster",
-            email: "editor@blogmaster.com",
-        },
-        bidAmount: "$750",
-        originalBudget: "$800",
-        proposedTimeline: "3 weeks",
-        submittedAt: "2024-01-13T09:15:00Z",
-        status: "rejected",
-        priority: "low",
-        proposal:
-            "I'm a professional content writer with expertise in SEO optimization. I can create engaging, well-researched articles that drive traffic and engagement.",
-        skills: ["SEO", "Content Writing", "Research", "WordPress"],
-        portfolio: ["https://blog1.com", "https://blog2.com"],
-        estimatedHours: 60,
-        milestones: [
-            { title: "Content Strategy", duration: "3 days", amount: "$150" },
-            { title: "Article Writing", duration: "2 weeks", amount: "$450" },
-            { title: "SEO Optimization", duration: "4 days", amount: "$150" },
-        ],
-    },
-    {
-        id: 4,
-        projectId: "PRJ-004",
-        projectTitle: "Digital Marketing Campaign",
-        freelancer: {
-            name: "David Wilson",
-            email: "david@example.com",
-            avatar: "/placeholder.svg?height=40&width=40",
-            rating: 4.9,
-            completedProjects: 25,
-            successRate: 96,
-        },
-        client: {
-            name: "Fashion Brand Co.",
-            email: "marketing@fashionbrand.com",
-        },
-        bidAmount: "$2,200",
-        originalBudget: "$2,500",
-        proposedTimeline: "8 weeks",
-        submittedAt: "2024-01-12T16:45:00Z",
-        status: "under_review",
-        priority: "high",
-        proposal:
-            "I'll create and manage a comprehensive digital marketing campaign including social media strategy, content creation, and paid advertising across multiple platforms.",
-        skills: ["Social Media", "Google Ads", "Analytics", "Content Strategy"],
-        portfolio: ["https://campaign1.com", "https://campaign2.com"],
-        estimatedHours: 200,
-        milestones: [
-            { title: "Strategy Development", duration: "1 week", amount: "$400" },
-            { title: "Content Creation", duration: "3 weeks", amount: "$900" },
-            { title: "Campaign Management", duration: "4 weeks", amount: "$900" },
-        ],
-    },
-]
+const formatCurrency = (amount) => {
+        return new Intl.NumberFormat("en-IN", {
+            style: "currency",
+            currency: "INR",
+        }).format(amount)
+    }
 
-const stats = [
-    {
-        title: "Total Bids",
-        value: "2,341",
-        change: "+18.2%",
-        trend: "up",
-        icon: FileText,
-        color: "blue",
-    },
-    {
-        title: "Pending Review",
-        value: "156",
-        change: "+12.5%",
-        trend: "up",
-        icon: Clock,
-        color: "yellow",
-    },
-    {
-        title: "Accepted Bids",
-        value: "1,847",
-        change: "+8.7%",
-        trend: "up",
-        icon: CheckCircle,
-        color: "green",
-    },
-    {
-        title: "Avg. Bid Value",
-        value: "$2,450",
-        change: "+5.3%",
-        trend: "up",
-        icon: DollarSign,
-        color: "purple",
-    },
-]
 
-export function BidsManagement() {
+export function BidsManagement({ bids }) {
+    const stats = [
+        {
+            title: "Total Bids",
+            value: bids?.totalBids || "0",
+            change: "+18.2%",
+            trend: "up",
+            icon: FileText,
+            color: "blue",
+        },
+        {
+            title: "Pending Review",
+            value: bids.pendingBids || "0",
+            change: "+12.5%",
+            trend: "up",
+            icon: Clock,
+            color: "yellow",
+        },
+        {
+            title: "Accepted Bids",
+            value: bids.acceptedBids || "0",
+            change: "+8.7%",
+            trend: "up",
+            icon: CheckCircle,
+            color: "green",
+        },
+        {
+            title: "Avg. Bid Value",
+            value: formatCurrency(bids.averageBidValue || 0),
+            change: "+5.3%",
+            trend: "up",
+            icon: DollarSign,
+            color: "purple",
+        },
+    ]
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedStatus, setSelectedStatus] = useState("all")
     const [selectedPriority, setSelectedPriority] = useState("all")
@@ -200,17 +72,20 @@ export function BidsManagement() {
     const getStatusColor = (status) => {
         switch (status) {
             case "accepted":
-                return "default"
+                return "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400";
             case "pending":
-                return "secondary"
+                return "bg-blue-300 text-blue-700 dark:bg-yellow-900/20 dark:text-yellow-400";
             case "under_review":
-                return "outline"
+                return "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400";
             case "rejected":
-                return "destructive"
+                return "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400";
+            case "completed":
+                return "bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400";
             default:
-                return "secondary"
+                return "bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400";
         }
-    }
+    };
+
 
     const getStatusIcon = (status) => {
         switch (status) {
@@ -227,30 +102,42 @@ export function BidsManagement() {
         }
     }
 
-    const getPriorityColor = (priority) => {
-        switch (priority) {
-            case "high":
-                return "text-red-600 dark:text-red-400"
-            case "medium":
-                return "text-yellow-600 dark:text-yellow-400"
-            case "low":
-                return "text-green-600 dark:text-green-400"
-            default:
-                return "text-gray-600 dark:text-gray-400"
-        }
-    }
+    // const getPriorityColor = (priority) => {
+    //     switch (priority) {
+    //         case "high":
+    //             return "text-red-600 dark:text-red-400"
+    //         case "medium":
+    //             return "text-yellow-600 dark:text-yellow-400"
+    //         case "low":
+    //             return "text-green-600 dark:text-green-400"
+    //         default:
+    //             return "text-gray-600 dark:text-gray-400"
+    //     }
+    // }
 
-    const filteredBids = bidsData.filter((bid) => {
+    const filteredBids = bids.bids.filter((bid) => {
+        const projectTitle = bid.job?.title || "";
+        const freelancerName = bid.freelancerInfo?.name || "";
+        const clientName = bid.clientInfo?.name || "";
+
+        // Search match
         const matchesSearch =
-            bid.projectTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            bid.freelancer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            bid.client.name.toLowerCase().includes(searchTerm.toLowerCase())
-        const matchesStatus = selectedStatus === "all" || bid.status === selectedStatus
-        const matchesPriority = selectedPriority === "all" || bid.priority === selectedPriority
-        const matchesTab = activeTab === "all" || bid.status === activeTab
+            projectTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            freelancerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            clientName.toLowerCase().includes(searchTerm.toLowerCase());
 
-        return matchesSearch && matchesStatus && matchesPriority && matchesTab
-    })
+        // Status match
+        const matchesStatus =
+            selectedStatus === "all" || bid.status === selectedStatus;
+
+
+        // Tab match
+        const matchesTab =
+            activeTab === "all" || bid.status === activeTab;
+
+        return matchesSearch && matchesStatus && matchesTab;
+    });
+
 
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString("en-US", {
@@ -261,6 +148,27 @@ export function BidsManagement() {
             minute: "2-digit",
         })
     }
+
+    const formatProjectId = (projectId) => {
+        if (!projectId) return "N/A";
+        const part1 = projectId.slice(0, 3).toUpperCase();      // First 3 chars
+        const part2 = projectId.slice(-3).toUpperCase();        // Last 3 chars
+        return `PRJ-${part1}${part2}`;
+    };
+
+    const calculateEstimatedHours = (createdAt, deadline) => {
+        if (!createdAt || !deadline) return "N/A";
+
+        const start = new Date(createdAt);
+        const end = new Date(deadline);
+
+        const diffMs = end - start;
+        const diffHours = diffMs / (1000 * 60 * 60);
+
+        return Math.max(0, diffHours.toFixed(1)); // avoid negative & keep 1 decimal
+    };
+
+
 
     return (
         <div className="space-y-8">
@@ -288,7 +196,7 @@ export function BidsManagement() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                 {stats.map((stat, index) => (
                     <Card key={index} className="hover:shadow-md transition-shadow">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
                             <CardTitle className="text-sm font-medium text-muted-foreground">{stat.title}</CardTitle>
                             <div className={`p-2 rounded-lg bg-${stat.color}-100 dark:bg-${stat.color}-900/20`}>
                                 <stat.icon className={`h-4 w-4 text-${stat.color}-600 dark:text-${stat.color}-400`} />
@@ -353,10 +261,9 @@ export function BidsManagement() {
                 </CardHeader>
                 <CardContent>
                     <Tabs value={activeTab} onValueChange={setActiveTab}>
-                        <TabsList className="grid w-full grid-cols-5">
+                        <TabsList className="grid w-full grid-cols-4">
                             <TabsTrigger value="all">All Bids</TabsTrigger>
                             <TabsTrigger value="pending">Pending</TabsTrigger>
-                            <TabsTrigger value="under_review">Review</TabsTrigger>
                             <TabsTrigger value="accepted">Accepted</TabsTrigger>
                             <TabsTrigger value="rejected">Rejected</TabsTrigger>
                         </TabsList>
@@ -364,7 +271,7 @@ export function BidsManagement() {
                         <TabsContent value={activeTab} className="mt-6">
                             <div className="space-y-4">
                                 {filteredBids.map((bid) => (
-                                    <Card key={bid.id} className="hover:shadow-md transition-shadow">
+                                    <Card key={bid._id} className="hover:shadow-md transition-shadow">
                                         <CardContent className="p-6">
                                             <div className="grid gap-6 lg:grid-cols-3">
                                                 {/* Left Column - Project & Freelancer Info */}
@@ -372,34 +279,38 @@ export function BidsManagement() {
                                                     <div className="flex items-start justify-between">
                                                         <div className="space-y-2">
                                                             <div className="flex items-center gap-2">
-                                                                <h3 className="font-semibold text-lg">{bid.projectTitle}</h3>
+                                                                <h3 className="font-semibold text-lg">{bid?.job?.title}</h3>
                                                                 <Badge variant="outline" className="text-xs">
-                                                                    {bid.projectId}
+                                                                    {formatProjectId(bid?._id)}
                                                                 </Badge>
                                                             </div>
                                                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                                                <span>Client: {bid.client.name}</span>
+                                                                <span>Client: {bid.clientInfo.name}</span>
                                                                 <span>•</span>
-                                                                <span>Submitted: {formatDate(bid.submittedAt)}</span>
+                                                                <span>Submitted: {formatDate(bid.updatedAt)}</span>
                                                             </div>
                                                         </div>
                                                         <div className="flex items-center gap-2">
-                                                            <Badge variant={getStatusColor(bid.status)} className="flex items-center gap-1">
+                                                            <Badge
+                                                                variant="outline"
+                                                                className={`flex items-center gap-1 ${getStatusColor(bid.status)}`}
+                                                            >
                                                                 {getStatusIcon(bid.status)}
                                                                 {bid.status.replace("_", " ").toUpperCase()}
                                                             </Badge>
-                                                            <span className={`text-sm font-medium ${getPriorityColor(bid.priority)}`}>
-                                                                {bid.priority.toUpperCase()}
-                                                            </span>
+
+                                                            {/* <span className={`text-sm font-medium ${getPriorityColor(bid.priority)}`}>
+                                                                {bid?.priority.toUpperCase()}
+                                                            </span> */}
                                                         </div>
                                                     </div>
 
                                                     {/* Freelancer Info */}
                                                     <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
                                                         <Avatar className="h-12 w-12">
-                                                            <AvatarImage src={bid.freelancer.avatar || "/placeholder.svg"} />
+                                                            <AvatarImage src={bid.freelancerInfo.profilePic || "/placeholder.svg"} />
                                                             <AvatarFallback>
-                                                                {bid.freelancer.name
+                                                                {bid.freelancerInfo.name
                                                                     .split(" ")
                                                                     .map((n) => n[0])
                                                                     .join("")}
@@ -407,35 +318,35 @@ export function BidsManagement() {
                                                         </Avatar>
                                                         <div className="flex-1">
                                                             <div className="flex items-center gap-2">
-                                                                <h4 className="font-medium">{bid.freelancer.name}</h4>
+                                                                <h4 className="font-medium">{bid.freelancerInfo.name}</h4>
                                                                 <div className="flex items-center gap-1">
                                                                     <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                                                                    <span className="text-sm font-medium">{bid.freelancer.rating}</span>
+                                                                    <span className="text-sm font-medium">{bid.freelancerInfo.rating}</span>
                                                                 </div>
                                                             </div>
-                                                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                                                <span>{bid.freelancer.completedProjects} projects completed</span>
+                                                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                                                {/* <span>{bid.freelancerInfo.completedProjects} projects completed</span> */}
                                                                 <span>•</span>
-                                                                <span>{bid.freelancer.successRate}% success rate</span>
+                                                                <span>{bid.freelancerInfo.bio}</span>
                                                             </div>
                                                         </div>
                                                         <div className="text-right">
-                                                            <div className="text-lg font-bold text-primary">{bid.bidAmount}</div>
-                                                            <div className="text-sm text-muted-foreground">Budget: {bid.originalBudget}</div>
+                                                            <div className="text-lg font-bold text-primary">{formatCurrency(bid.amount)}</div>
+                                                            <div className="text-sm text-muted-foreground">Budget: {formatCurrency(bid?.job?.budget)}</div>
                                                         </div>
                                                     </div>
 
                                                     {/* Proposal */}
                                                     <div className="space-y-2">
                                                         <h5 className="font-medium">Proposal</h5>
-                                                        <p className="text-sm text-muted-foreground line-clamp-3">{bid.proposal}</p>
+                                                        <p className="text-sm text-muted-foreground line-clamp-3">{bid.message}</p>
                                                     </div>
 
                                                     {/* Skills */}
                                                     <div className="space-y-2">
                                                         <h5 className="font-medium">Skills</h5>
                                                         <div className="flex flex-wrap gap-2">
-                                                            {bid.skills.map((skill, index) => (
+                                                            {bid?.job?.skills.map((skill, index) => (
                                                                 <Badge key={index} variant="secondary" className="text-xs">
                                                                     {skill}
                                                                 </Badge>
@@ -445,19 +356,19 @@ export function BidsManagement() {
                                                 </div>
 
                                                 {/* Right Column - Details & Actions */}
-                                                <div className="space-y-4">
+                                                <div className="space-y-4 bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
                                                     <div className="space-y-3">
                                                         <div className="flex items-center justify-between text-sm">
                                                             <span className="text-muted-foreground">Timeline</span>
-                                                            <span className="font-medium">{bid.proposedTimeline}</span>
+                                                            <span className="font-medium">{formatDate(bid?.job?.deadline)}</span>
                                                         </div>
                                                         <div className="flex items-center justify-between text-sm">
                                                             <span className="text-muted-foreground">Estimated Hours</span>
-                                                            <span className="font-medium">{bid.estimatedHours}h</span>
+                                                            <span className="font-medium">{calculateEstimatedHours(bid?.job?.createdAt, bid?.job?.deadline)}h</span>
                                                         </div>
                                                         <div className="flex items-center justify-between text-sm">
                                                             <span className="text-muted-foreground">Milestones</span>
-                                                            <span className="font-medium">{bid.milestones.length}</span>
+                                                            <span className="font-medium">{bid?.job?.milestones.length}</span>
                                                         </div>
                                                     </div>
 
@@ -465,14 +376,14 @@ export function BidsManagement() {
                                                     <div className="space-y-2">
                                                         <h5 className="font-medium text-sm">Project Milestones</h5>
                                                         <div className="space-y-2">
-                                                            {bid.milestones.map((milestone, index) => (
+                                                            {bid?.job?.milestones.map((milestone, index) => (
                                                                 <div
                                                                     key={index}
                                                                     className="flex items-center justify-between text-xs p-2 bg-muted/30 rounded"
                                                                 >
                                                                     <div>
-                                                                        <div className="font-medium">{milestone.title}</div>
-                                                                        <div className="text-muted-foreground">{milestone.duration}</div>
+                                                                        <div className="font-medium">{milestone.description}</div>
+                                                                        {/* <div className="text-muted-foreground">{milestone.isPaid ? "Paid" : "Unpaid"}</div> */}
                                                                     </div>
                                                                     <div className="font-medium">{milestone.amount}</div>
                                                                 </div>
@@ -482,7 +393,7 @@ export function BidsManagement() {
 
                                                     {/* Actions */}
                                                     <div className="space-y-2">
-                                                        {bid.status === "pending" && (
+                                                        {(bid.status === "pending" ) && (
                                                             <>
                                                                 <Button className="w-full" size="sm">
                                                                     <CheckCircle className="mr-2 h-4 w-4" />
@@ -510,7 +421,7 @@ export function BidsManagement() {
                                                                 </Button>
                                                             </>
                                                         )}
-                                                        {bid.status === "accepted" && (
+                                                        {bid.status === "accepted" || bid.status === "completed" && (
                                                             <Button variant="outline" className="w-full bg-transparent" size="sm">
                                                                 <Eye className="mr-2 h-4 w-4" />
                                                                 View Project

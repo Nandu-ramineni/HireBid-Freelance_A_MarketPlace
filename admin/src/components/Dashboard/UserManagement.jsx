@@ -282,8 +282,8 @@ export function UsersManagement({ clients }) {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>User</TableHead>
-                                <TableHead>Contact</TableHead>
-                                <TableHead>Role</TableHead>
+                                <TableHead>Contact</TableHead> 
+                                {/* <TableHead>Role</TableHead> */}
                                 <TableHead>Status</TableHead>
                                 <TableHead>Projects</TableHead>
                                 <TableHead>Rating</TableHead>
@@ -327,7 +327,7 @@ export function UsersManagement({ clients }) {
                                             </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell>
+                                    {/* <TableCell>
                                         <Badge variant={user.client.role === "Freelancer" ? "default" : "secondary"}>{user.client.role}</Badge>
                                         {user.client.role === "client" && user.clientProfile?.company && (
                                             <div className="text-xs text-muted-foreground mt-1">{user.clientProfile?.company || "N/A"}</div>
@@ -346,7 +346,7 @@ export function UsersManagement({ clients }) {
                                                 )}
                                             </div>
                                         )}
-                                    </TableCell>
+                                    </TableCell> */}
                                     <TableCell>
                                         <Badge className={statusColor(user.client.userStatus)}>
                                             {user.client.userStatus.charAt(0).toUpperCase() + user.client.userStatus.slice(1)}
