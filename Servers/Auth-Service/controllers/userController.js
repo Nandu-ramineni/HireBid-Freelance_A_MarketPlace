@@ -49,6 +49,14 @@ export const userRegister = async (req, res) => {
         const refreshToken = generateRefreshToken(newUser._id);
         res.status(201).json({ message: 'User registered successfully', accessToken, refreshToken });
         await sendWelcomeEmail(newUser.email, newUser.username);
+        try {
+            await axios.post('http://localhost:5005/api/notifications/send', {
+                userId: newUser._id,
+                message: 'Welcome to Freelance! Your account has been successfully created.', notificationType: 'in-app'
+            });
+        } catch (error) {
+            console.log('Error while sending welcome notification', error.message);
+        }
     } catch (error) {
         res.status(500).json({ message: 'Error while user registration', error: error.message });
     }
