@@ -199,6 +199,7 @@ export const getClients = async (req, res) => {
         res.status(500).json({ message: "Internal server error", error: error.message });
     }
 };
+
 export const getFreelancers = async (req, res) => {
     try {
         const cachedFreelancers = await getCache("freelancers");
@@ -219,6 +220,7 @@ export const getFreelancers = async (req, res) => {
         let totalActiveProjects = 0;
         let totalCompletedProjects = 0;
         let totalGrowth = 0;
+        let responseTime = 0;
 
         const freelancerData = freelancers.map((freelancer) => {
             const acceptedBids = bids.filter(
@@ -243,6 +245,17 @@ export const getFreelancers = async (req, res) => {
             const completedProjects = acceptedBids.filter(
                 (b) => b.status === "completed"
             ).length;
+            const successRate = completedProjects / projects * 100 || 0;
+
+            //calculate average response time in hours based on timestamps
+            let totalResponseTime = 0;
+            acceptedBids.forEach((bid) => {
+                const createdAt = new Date(bid.createdAt);
+                const acceptedAt = new Date(bid.updatedAt);
+                const diffInHours = Math.abs(acceptedAt - createdAt) / 36e5;
+                totalResponseTime += diffInHours;
+            });
+            responseTime = projects > 0 ? totalResponseTime / projects : 0;
             totalRevenue += userRevenue;
             totalActiveProjects += activeProjects;
             totalGrowth += growth;
@@ -266,6 +279,8 @@ export const getFreelancers = async (req, res) => {
                 userStatus: freelancer.userStatus,
                 availability: freelancer.freelancerProfile?.availability || "not set",
                 hourlyRate: freelancer.freelancerProfile?.hourlyRate || 0,
+                successRate: successRate.toFixed(2),
+                averageResponseTime: responseTime.toFixed(2), // in hours
             };
         });
 
