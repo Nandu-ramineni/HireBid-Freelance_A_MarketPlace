@@ -18,12 +18,16 @@ const PrivateRoute = () => {
 
     if (exp < now) {
       Cookies.remove('accessToken');
+      Cookies.remove('refreshToken');
+      localStorage.removeItem('role');
       return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
     return <Outlet />; // ✅ Render the nested route
   } catch (err) {
     Cookies.remove('accessToken');
+    Cookies.remove('refreshToken');
+    localStorage.removeItem('role');
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 };
