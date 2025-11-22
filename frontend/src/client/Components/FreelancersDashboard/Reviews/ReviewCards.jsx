@@ -311,21 +311,21 @@ const ReviewCards = ({ rateBids }) => {
                                         <div className="flex items-start gap-2">
                                             <Briefcase02Icon className="h-4 w-4 mt-1 text-muted-foreground" />
                                             <div className="flex-1">
-                                                <h4 className="font-medium text-sm mb-1">{jobId.title}</h4>
+                                                <h4 className="font-medium text-sm mb-1">{jobId?.title}</h4>
                                                 <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                                                     <span className="flex items-center gap-1">
                                                         <Wallet02Icon className="h-3 w-3" />
-                                                        Budget: {formatCurrency(jobId.budget)}
+                                                        Budget: {formatCurrency(jobId?.budget)}
                                                     </span>
                                                     <span className="flex items-center gap-1">
                                                         <Calendar02Icon className="h-3 w-3" />
-                                                        Deadline: {formatDate(jobId.deadline)}
+                                                        Deadline: {formatDate(jobId?.deadline)}
                                                     </span>
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="flex flex-wrap gap-1">
-                                            {jobId.skills?.slice(0, 4).map((skill, index) => (
+                                            {jobId?.skills?.slice(0, 4).map((skill, index) => (
                                                 <Badge
                                                     key={skill}
                                                     variant="outline"
@@ -360,8 +360,8 @@ const ReviewCards = ({ rateBids }) => {
                                             bidId={bid._id}
                                             clientId={item.clientId}
                                             clientName={`${item.clientName}`}
-                                            jobTitle={jobId.title}
-                                            jobId={jobId._id}
+                                            jobTitle={jobId?.title}
+                                            jobId={jobId?._id}
                                         />
                                     </div>
                                 </CardContent>
