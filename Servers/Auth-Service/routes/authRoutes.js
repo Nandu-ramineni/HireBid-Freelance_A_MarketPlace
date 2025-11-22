@@ -1,6 +1,6 @@
 import express from 'express';
 import { rateLimiterMiddleware } from '../utils/rateLimiter.js';
-import { changePassword, deleteUser, facebookOAuthLogin, forgotPassword, getAllFreelancers, getClient, getClientProfile, getClients, getFreelancers, getSavedProfiles, getUserById, getUsers, googleOAuthLogin, microsoftOAuthLogin, refreshTokens, resetPassword, saveFreelancerProfile, sendOtpToEmail, updateClientProfile, updateFreelancerProfile, updateProfile, updateUserStatus, upload, userLogin, userRegister, verifyOtp } from '../controllers/userController.js';
+import { changePassword, deleteUser, facebookOAuthLogin, forceLogoutAll, forgotPassword, getAllFreelancers, getClient, getClientProfile, getClients, getFreelancers, getSavedProfiles, getUserById, getUsers, googleOAuthLogin, microsoftOAuthLogin, refreshTokens, resetPassword, saveFreelancerProfile, sendOtpToEmail, updateClientProfile, updateFreelancerProfile, updateProfile, updateUserStatus, upload, userLogin, userRegister, verifyOtp } from '../controllers/userController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 import { createReview } from '../controllers/reviewController.js';
 
@@ -32,5 +32,6 @@ router.post('/reset-password/:resetToken',rateLimiterMiddleware,resetPassword);
 router.delete('/delete',authMiddleware, deleteUser);
 router.get('/freelancers', getAllFreelancers);
 router.patch('/update-status/:userId', updateUserStatus);
+router.post('/force-logout-all', forceLogoutAll);
 
 export default router;

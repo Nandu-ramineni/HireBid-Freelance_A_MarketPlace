@@ -9,6 +9,7 @@ import multer from "multer";
 import Subscription from "../models/Subscription.js";
 import SavedProfiles from "../models/Saved.profiles.js";
 import ip from "ip";
+import client from "../../Admin-service/utils/cache.js";
 const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'development',
@@ -113,7 +114,7 @@ export const userLogin = async (req, res) => {
         }
 
         await user.save();
-        const accessToken = generateAccessToken(user._id, user.role);
+        const accessToken = generateAccessToken(user._id, user.role, user.tokenVersion);
         const refreshToken = generateRefreshToken(user._id);
         // res.cookie('accessToken', accessToken, {...cookieOptions, maxAge: 7 * 24 * 60 * 60* 1000});
         // res.cookie('refreshToken', refreshToken, {...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000});
@@ -555,7 +556,7 @@ export const googleOAuthLogin = async (req, res) => {
         user.traction.lastLogin = new Date();
         user.traction.loginsCount += 1;
         await user.save();
-        const accessToken = generateAccessToken(user._id, user.role);
+        const accessToken = generateAccessToken(user._id, user.role, user.tokenVersion);
         const refreshToken = generateRefreshToken(user._id);
         res.status(200).json({ accessToken, refreshToken });
     } catch (error) {
@@ -719,3 +720,18 @@ export const updateUserStatus = async (req, res) => {
         res.status(500).json({ message: 'Error while updating user status', error: error.message });
     }
 }
+
+export const forceLogoutAll = async (req, res) => {
+    try {
+        await User.updateMany({}, { $inc: { tokenVersion: 1 } });
+        // delete all refresh tokens from redis
+        const keys = await client.keys("*");
+        for (let key of keys) await client.del(key);
+        return res.json({
+            success: true,
+            message: "All users have been logged out successfully."
+        });
+    } catch (err) {
+        return res.status(500).json({ success: false, error: err.message });
+    }
+};

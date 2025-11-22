@@ -7,34 +7,34 @@ const UserSchema = new mongoose.Schema({
         unique: true,
         lowercase: true
     },
-    email:{
+    email: {
         type: String,
         required: true,
         unique: true,
         lowercase: true
     },
-    password:{
+    password: {
         type: String,
     },
-    role:{
+    role: {
         type: String,
         enum: ['freelancer', 'client', 'admin'],
         default: 'client',
     },
-    firstName:{
+    firstName: {
         type: String,
     },
-    lastName:{
+    lastName: {
         type: String,
     },
-    profile:{
+    profile: {
         type: String,
     },
-    bio:{
+    bio: {
         type: String,
         trim: true
     },
-    freelancerProfile:{
+    freelancerProfile: {
         skills: [String],
         hourlyRate: Number,
         availability: {
@@ -50,7 +50,7 @@ const UserSchema = new mongoose.Schema({
         avgRating: { type: Number, default: 0 },
         totalReviews: { type: Number, default: 0 }
     },
-    clientProfile:{
+    clientProfile: {
         company: String,
         location: String,
         website: String,
@@ -65,7 +65,7 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    userStatus:{
+    userStatus: {
         type: String,
         enum: ['active', 'suspended'],
         default: 'active'
@@ -73,10 +73,10 @@ const UserSchema = new mongoose.Schema({
     googleId: {
         type: String,
     },
-    facebookId:{
+    facebookId: {
         type: String,
     },
-    microsoftId:{
+    microsoftId: {
         type: String
     },
     traction: {
@@ -89,30 +89,35 @@ const UserSchema = new mongoose.Schema({
             country: String
         }
     },
-    resetPasswordToken:{
+    resetPasswordToken: {
         type: String
     },
-    resetPasswordExpires:{
+    resetPasswordExpires: {
         type: Date
     },
     subscription: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Subscription'
-        },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Subscription'
+    },
     otp: String,
-    otpExpires: Date
+    otpExpires: Date,
+    tokenVersion: {
+        type: Number,
+        default: 1
+    }
+
 }, {
     timestamps: true,
 });
 
 UserSchema.pre('save', function (next) {
     if (this.role === 'freelancer' && !this.isModified('freelancerProfile')) {
-        this.clientProfile = undefined;  
+        this.clientProfile = undefined;
     } else if (this.role === 'client' && !this.isModified('clientProfile')) {
-        this.freelancerProfile = undefined; 
+        this.freelancerProfile = undefined;
     } else if (this.role === 'admin') {
-        this.freelancerProfile = undefined; 
-        this.clientProfile = undefined;  
+        this.freelancerProfile = undefined;
+        this.clientProfile = undefined;
     }
     next();
 });

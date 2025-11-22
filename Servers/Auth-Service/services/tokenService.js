@@ -15,8 +15,8 @@ client.connect()
 client.on('error', (err) => {
     console.error('Redis error', err);
 });
-export const generateAccessToken = (userId,role) => {
-    return jwt.sign({userId,role}, process.env.JWT_SECRET, {expiresIn: '1d'});
+export const generateAccessToken = (userId,role,tokenVersion) => {
+    return jwt.sign({userId,role,tokenVersion}, process.env.JWT_SECRET, {expiresIn: '1d'});
 }
 
 export const generateRefreshToken = (userId) => {
