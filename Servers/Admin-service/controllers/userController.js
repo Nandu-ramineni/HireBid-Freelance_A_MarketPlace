@@ -304,21 +304,15 @@ export const getFreelancers = async (req, res) => {
 
 export const forceLogoutUsers = async (req, res) => {
     try {
-        const { userIds } = req.body;
-        if (!Array.isArray(userIds) || userIds.length === 0) {
-            return res.status(400).json({ message: "Invalid user IDs" });
-        }
-        userIds.forEach((userId) => async () => {
-            const getUserLoginSessions = await axios.get(`http://localhost:5000/api/auth/userSessions/${userId}`);
-            const userSessions = getUserLoginSessions.data;
-
-            if (userSessions && userSessions.length > 0) {
-                await Promise.all(userSessions.map(session => {
-                    return axios.delete(`http://localhost:5000/api/auth/logout/${session._id}`);
-                }));
-            }
+        const response = await axios.post(
+            `http://localhost:5000/api/auth/force-logout-all`,
+            {},
+        );
+        res.status(200).json({
+            success: true,
+            message: "Forced logout executed successfully",
+            authServiceResponse: response.data
         });
-        res.status(200).json({ message: "Users logged out successfully" });
     } catch (error) {
         console.error("Error in forceLogoutUsers:", error);
         res.status(500).json({ message: "Internal server error", error: error.message });
