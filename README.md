@@ -75,6 +75,8 @@ Design documentation (`.tldr` and wireframes) is kept alongside services for imp
 * Razorpay milestone payments & invoice PDFs (EasyInvoice + Cloudinary)
 * Profile completeness, review system, saved freelancer lists
 
+![alt text](<Hirebid - A Freelance Market Place - visual selection.png>)
+
 ### 🛠 Admin Console
 
 * Login + token rotation via Redis
