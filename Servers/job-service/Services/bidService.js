@@ -16,7 +16,6 @@ export const placeBid = async (req, res) => {
             },
         });
 
-
         if (!subscriptionData || !subscriptionData.subscriptions || subscriptionData.subscriptions.length === 0) {
             return res.status(404).json({ message: 'Subscription details not found' });
         }
@@ -402,17 +401,14 @@ export const getFreelancerCompletedBids = async (req, res) => {
     try {
         const completedBids = await Bid.find({ freelancerId: userId, status: 'completed' })
             .populate('jobId', 'title image budget category skills deadline status');
-
         if (!completedBids.length) {
             return res.status(404).json({ message: 'No completed bids found for this freelancer' });
         }
-
         const totalCompletedBids = completedBids.length;
         const completedBidsWithClients = await Promise.all(
             completedBids.map(async (bid) => {
                 const clientDetails = await axios.get(`http://localhost:5000/api/auth/getClient/${bid.clientId}`);
                 if (!clientDetails.data) return null;
-
                 return {
                     bid,
                     clientName: clientDetails.data.clientProfile.company,
@@ -424,7 +420,6 @@ export const getFreelancerCompletedBids = async (req, res) => {
                 };
             })
         );
-
         res.status(200).json({ totalCompletedBids, completedBids: completedBidsWithClients.filter(Boolean) });
     }
     catch (error) {
