@@ -35,6 +35,7 @@ import {
   DollarSign,
   Filter,
   Globe,
+  RefreshCw,
   Search,
   Sliders,
   Star,
@@ -48,7 +49,7 @@ import Cloud from '@/assets/Images/Cloud.png'
 import Marketing from '@/assets/Images/Market.png'
 import Video from '@/assets/Images/Video.png'
 import Data from '@/assets/Images/Data.png'
-import { ArrowRight01Icon, Calendar01Icon, Calendar03Icon } from "hugeicons-react"
+import { AlertCircleIcon, ArrowRight01Icon, Calendar01Icon, Calendar03Icon } from "hugeicons-react"
 import { useNavigate } from "react-router-dom"
 // Sample data for filters
 const skills = [
@@ -177,12 +178,12 @@ export default function Jobs() {
     const matchesJobType =
       selectedJobTypes.length === 0 ||
       (job.jobType &&
-        selectedJobTypes.includes(job.jobType));
+        activeFilters.includes(job.jobType));
 
     const matchesExperienceLevel =
       selectedExperienceLevels.length === 0 ||
       (job.experienceLevel &&
-        selectedExperienceLevels.includes(job.experienceLevel));
+        activeFilters.includes(job.experienceLevel));
 
     const matchesLocation =
       activeFilters.length === 0 ||
@@ -208,8 +209,36 @@ export default function Jobs() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-red-500 text-center">Error: {error}</p>
+       <div className="min-h-screen flex items-center justify-center px-4 bg-muted/30">
+      <div className="max-w-md w-full bg-background border rounded-2xl shadow-md p-8 text-center">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
+          <AlertCircleIcon className="h-7 w-7 text-destructive" />
+        </div>
+
+        <h2 className="text-xl font-semibold mb-2">
+          Something went wrong
+        </h2>
+
+        <p className="text-sm text-muted-foreground mb-6">
+          {typeof error != "string"
+            ? error
+            : "We couldn’t load the data right now. Please try again."}
+        </p>
+
+        <div className="flex justify-center gap-3">
+          <Button
+            variant="destructive"
+            onClick={() => window.location.reload()}
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Retry
+          </Button>
+
+          <Button variant="outline" onClick={() => window.history.back()}>
+            Go Back
+          </Button>
+        </div>
+      </div>
       </div>
     )
   }

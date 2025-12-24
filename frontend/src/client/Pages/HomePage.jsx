@@ -37,7 +37,17 @@ import TopBar from "../Components/Header/TopBar"
 
 const HomePage = () => {
     const [isOpen, setIsOpen] = useState(false)
+    const location = useLocation()
     useTokenValidation();
+    const hideFooterRoutes = [
+    "/client-dashboard",
+    "/freelancer-dashboard",
+    "/dashboard",
+    ]
+    const shouldHideFooter = hideFooterRoutes.some((path) =>
+    location.pathname.startsWith(path)
+    )
+
     return (
         <DataProvider>
             {/* <TopBar/> */}
@@ -71,7 +81,7 @@ const HomePage = () => {
                 <Route path="*" element={<NotFound />} />
 
             </Routes>
-            <Footer />
+            {!shouldHideFooter && <Footer />}
         </DataProvider>
     )
 }

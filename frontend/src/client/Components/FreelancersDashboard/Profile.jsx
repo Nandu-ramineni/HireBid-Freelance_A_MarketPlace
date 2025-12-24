@@ -1,47 +1,53 @@
-import { getUser, userUpdate } from "@/client/Services/api"
-import { useEffect, useState, useRef } from "react"
-import {
-  Edit,
-  Save,
-  Plus,
-  X,
-  Camera,
-  Globe,
-  Award,
-  Briefcase,
-  GraduationCap,
-  Link,
-  Sparkles,
-  Clock,
-  DollarSign,
-  User,
-  FileText,
-  Zap,
-  RefreshCw,
-  ExternalLink,
-  Mail,
-  MapPin,
-  Calendar,
-  CheckCircle,
-  StarIcon,
-  MessageCircle,
-  Share2,
-  Download,
-  IndianRupee,
-} from "lucide-react"
+
+import { Badge } from "@/components/ui/badge"
+
+import { useState, useRef, useEffect } from "react"
+import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
-import { Alert02Icon, AlertSquareIcon, Briefcase02Icon, Briefcase05Icon, CheckmarkCircle01Icon, Clock01Icon, File01Icon, Globe02Icon, Link01Icon, Mortarboard01Icon, PencilEdit02Icon, UserCircle02Icon, Wallet01Icon, ZapIcon } from "hugeicons-react"
-import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { ToastContainer,toast } from "react-toastify"
+import { toast, ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+import {
+  MessageCircle,
+  CheckCircle,
+  Share2,
+  Download,
+  ExternalLink,
+  Award,
+  Clock,
+  User,
+  IndianRupee,
+  StarIcon,
+  RefreshCw,
+  Save,
+  Camera,
+  Plus,
+  X,
+  Mail,
+  MapPin,
+  Calendar,
+  TrendingUp,
+  Eye,
+  UserIcon,
+} from "lucide-react"
+import {
+  AlertSquareIcon as HugeAlertSquareIcon,
+  Briefcase02Icon as HugeBriefcase02Icon,
+  CheckmarkCircle01Icon as HugeCheckmarkCircle01Icon,
+  Clock01Icon as HugeClock01Icon,
+  Link01Icon as HugeLink01Icon,
+  PencilEdit02Icon as HugePencilEdit02Icon,
+  UserCircle02Icon as HugeUserCircle02Icon,
+} from "hugeicons-react"
+import { getUser, userUpdate } from "@/client/Services/api"
+import { Link } from "react-router-dom"
 
 const profileInitialState = {
   firstName: "",
@@ -56,16 +62,16 @@ const profileInitialState = {
   bio: "",
 }
 
-// Skill badge component without animation
 const SkillBadge = ({ skill, onRemove, isEditing = false }) => {
   return (
     <div className="inline-flex">
       <Badge
         variant="secondary"
         className={cn(
-          "px-3 py-1 text-sm font-medium rounded-full",
-          "bg-gradient-to-r from-primary/10 to-primary/5 hover:from-primary/20 hover:to-primary/10",
-          "border border-primary/20",
+          "px-3 py-1.5 text-sm font-medium rounded-lg",
+          "bg-primary/10 hover:bg-primary/15",
+          "border border-primary/20 hover:border-primary/30",
+          "transition-all duration-200",
         )}
       >
         {skill}
@@ -73,7 +79,7 @@ const SkillBadge = ({ skill, onRemove, isEditing = false }) => {
           <Button
             variant="ghost"
             size="sm"
-            className="ml-1 h-4 w-4 p-0 text-primary/70 hover:text-primary hover:bg-transparent"
+            className="ml-2 h-4 w-4 p-0 text-primary/70 hover:text-primary hover:bg-transparent"
             onClick={onRemove}
           >
             <X className="h-3 w-3" />
@@ -84,32 +90,29 @@ const SkillBadge = ({ skill, onRemove, isEditing = false }) => {
   )
 }
 
-// Profile stat card component
 const StatCard = ({ icon: Icon, title, value, color = "from-primary to-indigo-600" }) => {
   return (
-    <div className="bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden">
-      <div className="p-4">
-        <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg bg-gradient-to-br ${color} text-white`}>
+    <Card className="border-0 shadow-sm hover:shadow-md transition-all duration-300">
+      <CardContent className="p-5">
+        <div className="flex items-center gap-4">
+          <div className={`p-3 rounded-xl bg-gradient-to-br ${color} text-white shadow-sm`}>
             <Icon className="h-5 w-5" />
           </div>
-          <div>
-            <p className="text-sm text-slate-500">{title}</p>
-            <p className="font-semibold text-slate-900">{value}</p>
+          <div className="flex-1">
+            <p className="text-sm text-muted-foreground font-medium">{title}</p>
+            <p className="text-2xl font-bold text-foreground mt-1">{value}</p>
           </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }
 
-// Replace the PublicProfileCard component with this improved version
 const PublicProfileCard = ({ profile, isOpen, setIsOpen }) => {
   const [copied, setCopied] = useState(false)
   const [activeTab, setActiveTab] = useState("about")
 
   const copyProfileLink = () => {
-    // In a real app, this would be the actual profile URL
     const profileUrl = `https://yourplatform.com/profile/${profile.username || profile._id}`
     navigator.clipboard.writeText(profileUrl)
     setCopied(true)
@@ -117,7 +120,6 @@ const PublicProfileCard = ({ profile, isOpen, setIsOpen }) => {
     toast.info("Profile link copied to clipboard")
   }
 
-  // Format date to readable format
   const formatDate = (dateString) => {
     if (!dateString) return "N/A"
     const date = new Date(dateString)
@@ -127,21 +129,20 @@ const PublicProfileCard = ({ profile, isOpen, setIsOpen }) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-[650px] p-0 overflow-hidden bg-white rounded-xl max-h-[90vh] flex flex-col">
-        {/* Header with banner */}
-        <div className="relative z-10 h-40 bg-gradient-to-r from-primary/80 to-indigo-600/80 overflow-hidden flex-shrink-0">
-          <div
-            className="absolute inset-0 opacity-20"
-            style={{
-              backgroundImage:
-                'url("https://img.freepik.com/free-photo/robot-handshake-human-background-futuristic-digital-age_53876-129770.jpg?uid=R114405257&ga=GA1.1.792639287.1743599003&semt=ais_hybrid&w=740")',
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          />
+        <div className="relative z-10 h-40 bg-gradient-to-br from-primary via-primary/90 to-indigo-600 overflow-hidden flex-shrink-0">
+          <div className="absolute inset-0 opacity-10">
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
+                backgroundSize: "40px 40px",
+              }}
+            />
+          </div>
 
           {/* Profile image */}
-          <div className="absolute top-12 left-6 ">
-            <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
+          <div className="absolute top-12 left-6">
+            <Avatar className="h-24 w-24 border-4 border-white shadow-xl ring-2 ring-primary/20">
               <AvatarImage
                 src={profile.profile || "/placeholder.svg?height=96&width=96"}
                 alt="Profile"
@@ -154,12 +155,15 @@ const PublicProfileCard = ({ profile, isOpen, setIsOpen }) => {
             </Avatar>
           </div>
 
-          {/* Action buttons */}
           <div className="absolute top-4 right-14 flex gap-2">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" className="bg-white/20 hover:bg-white/30 text-white rounded-full">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-full shadow-lg"
+                  >
                     <MessageCircle className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -175,7 +179,7 @@ const PublicProfileCard = ({ profile, isOpen, setIsOpen }) => {
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="bg-white/20 hover:bg-white/30 text-white rounded-full"
+                    className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-full shadow-lg"
                     onClick={copyProfileLink}
                   >
                     {copied ? <CheckCircle className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
@@ -190,7 +194,11 @@ const PublicProfileCard = ({ profile, isOpen, setIsOpen }) => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="icon" variant="ghost" className="bg-white/20 hover:bg-white/30 text-white rounded-full">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-full shadow-lg"
+                  >
                     <Download className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -203,8 +211,7 @@ const PublicProfileCard = ({ profile, isOpen, setIsOpen }) => {
         </div>
 
         {/* Profile content */}
-        <div className=" px-6 pb-0 flex-grow overflow-y-scroll flex flex-col" style={{ scrollbarWidth: "thin" }}>
-          {/* Name and basic info */}
+        <div className="px-6 pb-0 flex-grow overflow-y-scroll flex flex-col" style={{ scrollbarWidth: "thin" }}>
           <div className="mb-4">
             <div className="flex items-start justify-between">
               <div>
@@ -410,7 +417,7 @@ const PublicProfileCard = ({ profile, isOpen, setIsOpen }) => {
   )
 }
 
-const Profile = ({freelancerAnalytics}) => {
+const Profile = ({ freelancerAnalytics }) => {
   const [profile, setProfile] = useState(profileInitialState)
   const [updateProfile, setUpdateProfile] = useState(profileInitialState)
   const [image, setImage] = useState("")
@@ -431,76 +438,58 @@ const Profile = ({freelancerAnalytics}) => {
     setIsLoading(true)
     try {
       const response = await getUser()
+      const data = response.data
+
       const profileData = {
-        ...response.data,
-        skills: response.data.skills || [],
-        languages: response.data.languages || [],
-        portfolio: response.data.portfolio || [],
+        ...data,
+
+        // flatten freelancerProfile into top-level fields for your form/UI
+        skills: data.freelancerProfile?.skills || [],
+        languages: data.freelancerProfile?.languages || [],
+        portfolio: data.freelancerProfile?.portfolio || [],
+        experience: data.freelancerProfile?.experience || "",
+        education: data.freelancerProfile?.education || "",
+        hourlyRate: data.freelancerProfile?.hourlyRate || 0,
+        availability: data.freelancerProfile?.availability || "",
       }
+
       setProfile(profileData)
       setUpdateProfile(profileData)
       calculateCompletionPercentage(profileData)
     } catch (error) {
       console.error(error)
-      toast({
-        title: "Error",
-        description: "Failed to fetch profile data. Please try again.",
-        variant: "destructive",
-      })
+      toast.error("Failed to fetch profile data. Please try again.")
     } finally {
       setIsLoading(false)
     }
   }
 
   const calculateCompletionPercentage = (profileData) => {
-  const flatFields = ["firstName", "lastName", "bio", "username", "profile"]
-  const nestedFields = [
-    "skills",
-    "languages",
-    "portfolio",
-    "experience",
-    "education",
-    "hourlyRate",
-    "availability",
-    "avgRating"
-  ]
+    const flatFields = ["firstName", "lastName", "bio", "username", "profile"]
+    const nestedFields = ["skills", "languages", "portfolio", "experience", "education", "hourlyRate", "availability"]
 
-  let filledFields = 0
-  const totalFields = flatFields.length + nestedFields.length
+    let filledFields = 0
+    const totalFields = flatFields.length + nestedFields.length
 
-  // Check top-level flat fields
-  flatFields.forEach((field) => {
-    const value = profileData[field]
-    if (
-      value !== null &&
-      value !== undefined &&
-      value !== "" &&
-      !(typeof value === "number" && value === 0)
-    ) {
-      filledFields++
-    }
-  })
+    flatFields.forEach((field) => {
+      const value = profileData[field]
+      if (value !== null && value !== undefined && value !== "" && !(typeof value === "number" && value === 0)) {
+        filledFields++
+      }
+    })
 
-  // Check nested freelancerProfile fields
-  nestedFields.forEach((field) => {
-    const value = profileData.freelancerProfile?.[field]
-    if (Array.isArray(value)) {
-      if (value.length > 0) filledFields++
-    } else if (
-      value !== null &&
-      value !== undefined &&
-      value !== "" &&
-      !(typeof value === "number" && value === 0)
-    ) {
-      filledFields++
-    }
-  })
+    nestedFields.forEach((field) => {
+      const value = profileData.freelancerProfile?.[field]
+      if (Array.isArray(value)) {
+        if (value.length > 0) filledFields++
+      } else if (value !== null && value !== undefined && value !== "" && !(typeof value === "number" && value === 0)) {
+        filledFields++
+      }
+    })
 
-  const percentage = Math.round((filledFields / totalFields) * 100)
-  setCompletionPercentage(percentage)
-}
-
-
+    const percentage = Math.round((filledFields / totalFields) * 100)
+    setCompletionPercentage(percentage)
+  }
 
   const handleUpdateProfile = (e) => {
     const { name, value } = e.target
@@ -571,193 +560,262 @@ const Profile = ({freelancerAnalytics}) => {
   }, [])
 
   return (
-    <div
-      className="relative h-[90vh] overflow-y-auto bg-gradient-to-b from-slate-50 to-slate-100 pb-20 p-2 md:p-6"
-      style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-    >
-      <ToastContainer/>
-      <div>
+    <div className="h-[91vh] overflow-y-scroll bg-slate-50 pb-20 p-4 md:p-8" style={{ scrollbarWidth: "thin" }}>
+      <ToastContainer />
+
+      <div className="max-w-7xl mx-auto">
         {completionPercentage < 100 && (
-          <div className="bg-yellow-300 text-yellow-800 px-3 py-1 rounded-md overflow-hidden animate-marquee whitespace-nowrap text-sm font-medium text-center w-full md:w-2/6 flex justify-center gap-2 mx-auto ">
-            <AlertSquareIcon className="h-5 w-5 " /> Complete your profile to get hired by clients!  
+          <div className="bg-amber-50 border border-amber-200 text-amber-900 px-5 py-3.5 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
+            <HugeAlertSquareIcon className="h-5 w-5 flex-shrink-0 text-amber-600" />
+            <div className="flex-1">
+              <p className="font-semibold text-sm">Complete your profile to get more opportunities</p>
+              <p className="text-xs text-amber-700 mt-0.5">{completionPercentage}% complete</p>
+            </div>
+            <div className="w-32 h-2 bg-amber-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-amber-500 transition-all duration-500"
+                style={{ width: `${completionPercentage}%` }}
+              />
+            </div>
           </div>
         )}
-        
-      </div>
-      {/* Background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="rounded-full absolute top-[-200px] right-[-200px] w-[600px] h-[600px] bg-primary/5 blur-[100px]" />
-        <div className="rounded-full absolute bottom-[-100px] left-[-100px] w-[500px] h-[500px] bg-indigo-500/5 blur-[80px]" />
-      </div>
 
-      <div className="container px-4 py-8 relative z-10">
-        <div>
-          <Card className="w-full overflow-hidden border-none shadow-xl">
-            {/* Profile header with banner */}
-            <CardHeader ref={headerRef} className="relative h-64 p-0 overflow-hidden rounded-t-xl">
-              <div className="absolute inset-0 " />
-
-              {/* Background pattern */}
-              <div
-                loading="lazy"
-                className="absolute -inset-2 "
-                style={{
-                  backgroundImage:
-                    'url("https://images.unsplash.com/photo-1644088379091-d574269d422f?q=80&w=1393&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")',
-                  backgroundSize: "cover",
-                }}
-              />
-
-              {/* Profile completion indicator */}
-              <div className="absolute top-4 right-4 bg-white/10 backdrop-blur-md rounded-full px-4 py-1.5 border border-white/20">
-                <div className="flex items-center gap-2">
-                  {completionPercentage === 100 ? (
-                    <span className="text-xs font-medium text-emerald-400">Profile Completed</span>
-                  ) : (
-                    <>
-                      <div className="relative w-16 h-2 bg-white/20 rounded-full overflow-hidden">
-                        <div
-                          className="absolute inset-y-0 left-0 bg-white transition-all duration-300"
-                          style={{ width: `${completionPercentage}%` }}
-                        />
-                      </div>
-                      <span className="text-xs font-medium text-white">{completionPercentage}%</span>
-                    </>
-                  )}
-                </div>
-
-              </div>
-
-              {/* Profile image and name */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/50 to-transparent">
-                <div className="flex items-end gap-6">
-                  <div className="relative">
-                    <div
-                      className="relative"
-                      onMouseEnter={() => setIsImageHovered(true)}
-                      onMouseLeave={() => setIsImageHovered(false)}
-                    >
-                      <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
-                        <AvatarImage
-                          src={imagePreview || profile.profile || "/placeholder.svg?height=96&width=96"}
-                          alt="Profile"
-                          className="object-cover"
-                          loading="lazy"
-                        />
-                        <AvatarFallback className="bg-primary text-white text-xl">
-                          {profile.firstName?.[0]}
-                          {profile.lastName?.[0]}
-                        </AvatarFallback>
-                      </Avatar>
-
-                      {isEditing && isImageHovered && (
-                        <label
-                          className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer"
-                          htmlFor="profile-image"
-                        >
-                          <Camera className="h-6 w-6 text-white" />
-                          <input
-                            type="file"
-                            id="profile-image"
-                            className="sr-only"
-                            onChange={handleImageChange}
-                            accept="image/*"
-                          />
-                        </label>
-                      )}
-                    </div>
-
-                    {/* Status indicator */}
-                    <div className="absolute bottom-1 right-1 h-4 w-4 rounded-full bg-emerald-500 border-2 border-white" />
-                  </div>
-
-                  <div>
-                    <h1 className="text-3xl font-bold text-white flex items-center gap-2">
-                      {profile.firstName} {profile.lastName}
-                      <Badge className="ml-2 bg-white/20 text-white border-white/10">Pro</Badge>
-                    </h1>
-                    <p className="text-white/80">{profile.email}</p>
-                  </div>
-                </div>
-              </div>
-            </CardHeader>
-
-            <CardContent className="pt-6 px-6 pb-8 bg-white">
-              {/* Action buttons */}
-              <div className="flex justify-between items-center mb-8">
-                <div className="flex gap-2">
-                  <Badge variant="outline" className="px-3 py-1 bg-primary/5 border-primary/20 text-primary">
-                    <User className="h-3.5 w-3.5 mr-1" />
-                    {profile.username || "Username"}
-                  </Badge>
-
-                  <Badge
-                    variant="outline"
-                    className="px-3 py-1 bg-emerald-500/5 border-emerald-500/20 text-emerald-600"
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-4 space-y-6">
+            <Card className="border-0 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex flex-col items-center text-center">
+                  <div
+                    className="relative mb-4"
+                    onMouseEnter={() => setIsImageHovered(true)}
+                    onMouseLeave={() => setIsImageHovered(false)}
                   >
-                    <Clock className="h-3.5 w-3.5 mr-1" />
-                    {profile.availability || "Available"}
-                  </Badge>
-                </div>
+                    <Avatar className="h-32 w-32 border-4 border-primary/10 shadow-lg">
+                      <AvatarImage
+                        src={imagePreview || profile.profile || "/placeholder.svg?height=128&width=128"}
+                        alt="Profile"
+                        className="object-cover"
+                        loading="lazy"
+                      />
+                      <AvatarFallback className="bg-gradient-to-br from-primary to-indigo-600 text-white text-3xl font-bold">
+                        {profile.firstName?.[0]}
+                        {profile.lastName?.[0]}
+                      </AvatarFallback>
+                    </Avatar>
 
-                <div>
-                  <Button
-                    variant={isEditing ? "default" : "outline"}
-                    className={cn(
-                      "relative overflow-hidden group",
-                      isEditing ? "bg-primary text-white" : "border-primary/20 text-primary hover:bg-primary/5",
+                    {isEditing && isImageHovered && (
+                      <label
+                        className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm rounded-full cursor-pointer transition-all"
+                        htmlFor="profile-image"
+                      >
+                        <Camera className="h-8 w-8 text-white drop-shadow-lg" />
+                        <input
+                          type="file"
+                          id="profile-image"
+                          className="sr-only"
+                          onChange={handleImageChange}
+                          accept="image/*"
+                        />
+                      </label>
                     )}
-                    onClick={isEditing ? handleSaveProfile : () => setIsEditing(true)}
-                    disabled={isLoading}
-                  >
-                    <span className="relative z-10 flex items-center gap-1.5">
+
+                    <div className="absolute bottom-2 right-2 h-5 w-5 rounded-full bg-emerald-500 border-3 border-white shadow-lg" />
+                  </div>
+
+                  <h1 className="text-2xl font-bold text-foreground mb-1">
+                    {profile.firstName} {profile.lastName}
+                  </h1>
+                  <p className="text-sm text-muted-foreground mb-3">{profile.email}</p>
+
+                  <div className="flex gap-2 mb-4">
+                    <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 capitalize">
+                      <UserIcon className="h-3 w-3 mr-1" />
+                      {profile.username || "Username"}
+                    </Badge>
+                    <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 border-emerald-200 capitalize">
+                      <Clock className="h-3 w-3 mr-1" />
+                      {profile.availability || "Available"}
+                    </Badge>
+                  </div>
+
+                  <div className="w-full space-y-2">
+                    <Button
+                      variant={isEditing ? "default" : "outline"}
+                      className="w-full"
+                      onClick={isEditing ? handleSaveProfile : () => setIsEditing(true)}
+                      disabled={isLoading}
+                    >
                       {isLoading ? (
                         <>
-                          <RefreshCw className="h-4 w-4 animate-spin" />
+                          <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                           {isEditing ? "Saving..." : "Loading..."}
                         </>
                       ) : (
                         <>
-                          {isEditing ? <Save className="h-4 w-4 mr-1" /> : <PencilEdit02Icon className="h-4 w-4 mr-1" />}
+                          {isEditing ? (
+                            <Save className="h-4 w-4 mr-2" />
+                          ) : (
+                            <HugePencilEdit02Icon className="h-4 w-4 mr-2" />
+                          )}
                           {isEditing ? "Save Profile" : "Edit Profile"}
                         </>
                       )}
-                    </span>
-                  </Button>
-                </div>
-              </div>
+                    </Button>
 
-              {/* Stats row */}
-              <div className="mb-8">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <StatCard icon={CheckmarkCircle01Icon} title="Completed Projects" value={freelancerAnalytics?.totalCompletedJobs} color="from-emerald-500 to-teal-600" />
-                  <StatCard
-                    icon={IndianRupee}
-                    title="Hourly Rate"
-                    value={`₹${profile?.freelancerProfile?.hourlyRate || 0}/hr`}
-                    color="from-amber-500 to-orange-600"
-                  />
-                  <StatCard icon={Star} title="Rating" value={`${profile?.freelancerProfile?.avgRating || 0}/5`} color="from-yellow-500 to-amber-600" />
-                  <StatCard icon={Clock01Icon} title="Response Time" value="< 2 hours" color="from-blue-500 to-indigo-600" />
+                    <Button
+                      variant="outline"
+                      className="w-full bg-transparent"
+                      onClick={() => setIsPublicProfileOpen(true)}
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      Preview Profile
+                    </Button>
+                  </div>
                 </div>
-              </div>
 
-              {/* Tabs section */}
-              <div>
-                <Tabs defaultValue="personal" value={activeTab} onValueChange={setActiveTab} className="w-full">
-                  <TabsList className="grid w-full grid-cols-4 mb-8 bg-slate-100 p-1 rounded-lg">
+                <div className="mt-6 pt-6 border-t">
+                  <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-primary" />
+                    Performance Overview
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="text-muted-foreground">Profile Completion</span>
+                        <span className="font-semibold text-foreground">{completionPercentage}%</span>
+                      </div>
+                      <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-primary to-indigo-600 transition-all duration-500"
+                          style={{ width: `${completionPercentage}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="text-muted-foreground">Success Rate</span>
+                        <span className="font-semibold text-emerald-600">100%</span>
+                      </div>
+                      <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-emerald-500 w-full" />
+                      </div>
+                    </div>
+                  </div>
+                  {/* <h3 className="text-sm font-semibold text-foreground mb-3">Quick Stats</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Projects</span>
+                      <span className="font-semibold text-foreground">
+                        {freelancerAnalytics?.totalCompletedJobs || 0}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Hourly Rate</span>
+                      <span className="font-semibold text-foreground">
+                        ₹{profile?.freelancerProfile?.hourlyRate || 0}/hr
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Rating</span>
+                      <span className="font-semibold text-foreground flex items-center gap-1">
+                        {profile?.freelancerProfile?.avgRating || 0}/5
+                        <StarIcon className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Response Time</span>
+                      <span className="font-semibold text-foreground">{"< 2 hours"}</span>
+                    </div>
+                  </div> */}
+                </div>
+
+                {/* {updateProfile.skills.length > 0 && (
+                  <div className="mt-6 pt-6 border-t">
+                    <h3 className="text-sm font-semibold text-foreground mb-3">Top Skills</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {updateProfile.skills.slice(0, 5).map((skill) => (
+                        <SkillBadge key={skill} skill={skill} />
+                      ))}
+                    </div>
+                  </div>
+                )} */}
+              </CardContent>
+            </Card>
+
+            {/* <Card className="border-0 shadow-lg">
+              <CardContent className="p-6">
+                <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                  Performance Overview
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-muted-foreground">Profile Completion</span>
+                      <span className="font-semibold text-foreground">{completionPercentage}%</span>
+                    </div>
+                    <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-primary to-indigo-600 transition-all duration-500"
+                        style={{ width: `${completionPercentage}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-muted-foreground">Success Rate</span>
+                      <span className="font-semibold text-emerald-600">100%</span>
+                    </div>
+                    <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-emerald-500 w-full" />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card> */}
+          </div>
+
+          <div className="lg:col-span-8 space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <StatCard
+                icon={HugeCheckmarkCircle01Icon}
+                title="Completed"
+                value={freelancerAnalytics?.totalCompletedJobs || 0}
+                color="from-emerald-500 to-teal-600"
+              />
+              <StatCard
+                icon={IndianRupee}
+                title="Rate"
+                value={`₹${profile?.freelancerProfile?.hourlyRate || 0}`}
+                color="from-amber-500 to-orange-600"
+              />
+              <StatCard
+                icon={StarIcon}
+                title="Rating"
+                value={`${profile?.freelancerProfile?.avgRating || 0}/5`}
+                color="from-yellow-500 to-amber-600"
+              />
+              <StatCard icon={HugeClock01Icon} title="Response" value="< 2h" color="from-blue-500 to-indigo-600" />
+            </div>
+
+            <Card className="border-0 shadow-lg">
+              <CardContent className="p-6">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  <TabsList className="grid w-full grid-cols-4 mb-6 bg-slate-100 p-1 rounded-lg">
                     {[
-                      { id: "personal", label: "Personal", icon: UserCircle02Icon },
-                      { id: "professional", label: "Professional", icon: Briefcase02Icon },
+                      { id: "personal", label: "Personal", icon: HugeUserCircle02Icon },
+                      { id: "professional", label: "Professional", icon: HugeBriefcase02Icon },
                       { id: "experience", label: "Experience", icon: Award },
-                      { id: "portfolio", label: "Portfolio", icon: Link01Icon },
+                      { id: "portfolio", label: "Portfolio", icon: HugeLink01Icon },
                     ].map((tab) => (
                       <TabsTrigger
                         key={tab.id}
                         value={tab.id}
                         className={cn(
-                          "flex items-center gap-1.5 data-[state=active]:bg-white data-[state=active]:shadow-sm",
-                          "transition-all duration-300 data-[state=active]:text-primary",
+                          "flex items-center justify-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md",
+                          "transition-all duration-200 data-[state=active]:text-primary font-medium text-sm",
                         )}
                       >
                         <tab.icon className="h-4 w-4" />
@@ -766,454 +824,328 @@ const Profile = ({freelancerAnalytics}) => {
                     ))}
                   </TabsList>
 
-                  <div className="bg-slate-50/50 rounded-xl p-6 border border-slate-100">
-                    <TabsContent value="personal" className="mt-0">
-                      <div>
-                        <CardTitle className="mb-6 flex items-center gap-2 text-slate-900">
-                          <User className="h-5 w-5 text-primary" />
-                          Personal Information
-                        </CardTitle>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                          <div className="space-y-6">
-                            <div className="space-y-2">
-                              <Label htmlFor="firstName" className="text-sm font-medium text-slate-700">
-                                First Name
-                              </Label>
-                              {isEditing ? (
-                                <Input
-                                  id="firstName"
-                                  name="firstName"
-                                  value={updateProfile.firstName}
-                                  onChange={handleUpdateProfile}
-                                  className="border-slate-200 focus:border-primary focus:ring-primary/20"
-                                />
-                              ) : (
-                                <div className="p-2.5 bg-white rounded-md border border-slate-200 text-slate-700">
-                                  {profile.firstName || "Not specified"}
-                                </div>
-                              )}
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label htmlFor="lastName" className="text-sm font-medium text-slate-700">
-                                Last Name
-                              </Label>
-                              {isEditing ? (
-                                <Input
-                                  id="lastName"
-                                  name="lastName"
-                                  value={updateProfile.lastName}
-                                  onChange={handleUpdateProfile}
-                                  className="border-slate-200 focus:border-primary focus:ring-primary/20"
-                                />
-                              ) : (
-                                <div className="p-2.5 bg-white rounded-md border border-slate-200 text-slate-700">
-                                  {profile.lastName || "Not specified"}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="space-y-6">
-                            <div className="space-y-2">
-                              <Label htmlFor="bio" className="text-sm font-medium text-slate-700">
-                                Bio
-                              </Label>
-                              {isEditing ? (
-                                <Textarea
-                                  id="bio"
-                                  name="bio"
-                                  value={updateProfile.bio || ""}
-                                  onChange={handleUpdateProfile}
-                                  className="min-h-[120px] border-slate-200 focus:border-primary focus:ring-primary/20"
-                                  placeholder="Tell us about yourself..."
-                                />
-                              ) : (
-                                <div className="p-2.5 bg-white rounded-md border border-slate-200 text-slate-700 min-h-[120px]">
-                                  {profile.bio || "No bio provided yet."}
-                                </div>
-                              )}
-                            </div>
-                          </div>
+                  {/* Personal Tab */}
+                  <TabsContent value="personal" className="mt-0 space-y-6">
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 text-foreground">Personal Information</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="firstName" className="text-sm font-medium">
+                            First Name
+                          </Label>
+                          <Input
+                            id="firstName"
+                            name="firstName"
+                            value={updateProfile.firstName}
+                            onChange={handleUpdateProfile}
+                            disabled={!isEditing}
+                            className="mt-1.5"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="lastName" className="text-sm font-medium">
+                            Last Name
+                          </Label>
+                          <Input
+                            id="lastName"
+                            name="lastName"
+                            value={updateProfile.lastName}
+                            onChange={handleUpdateProfile}
+                            disabled={!isEditing}
+                            className="mt-1.5"
+                          />
                         </div>
                       </div>
-                    </TabsContent>
+                    </div>
 
-                    <TabsContent value="professional" className="mt-0">
-                      <div>
-                        <CardTitle className="mb-6 flex items-center gap-2 text-slate-900">
-                          <Briefcase05Icon className="h-5 w-5 text-primary" />
-                          Professional Profile
-                        </CardTitle>
+                    <div>
+                      <Label htmlFor="bio" className="text-sm font-medium">
+                        Bio
+                      </Label>
+                      <Textarea
+                        id="bio"
+                        name="bio"
+                        value={updateProfile.bio}
+                        onChange={handleUpdateProfile}
+                        rows={2}
+                        disabled={!isEditing}
+                        className="mt-1.5"
+                        placeholder="Tell us about yourself..."
+                      />
+                    </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                          <div className="space-y-6">
-                            <div className="space-y-2">
-                              <Label
-                                htmlFor="skills"
-                                className="text-sm font-medium text-slate-700 flex items-center gap-1.5"
-                              >
-                                <ZapIcon className="h-4 w-4 text-primary" />
-                                Skills
-                              </Label>
+                    <div>
+                      <Label className="text-sm font-medium">Skills</Label>
+                      <div className="flex flex-wrap gap-2 mt-2 min-h-[40px] p-3 border rounded-lg bg-slate-50">
+                        {updateProfile.skills.length > 0 ? (
+                          updateProfile.skills.map((skill, index) => (
+                            <SkillBadge
+                              key={skill}
+                              skill={skill}
+                              onRemove={() => removeItem("skills", index)}
+                              isEditing={isEditing}
+                            />
+                          ))
+                        ) : (
+                          <span className="text-sm text-muted-foreground italic">No skills added yet</span>
+                        )}
+                      </div>
+                      {isEditing && (
+                        <div className="flex gap-2 mt-3">
+                          <Input
+                            value={newSkill}
+                            onChange={(e) => setNewSkill(e.target.value)}
+                            placeholder="Add a skill (e.g., React, Node.js)"
+                            onKeyPress={(e) => {
+                              if (e.key === "Enter") {
+                                addItem("skills", newSkill, setNewSkill)
+                              }
+                            }}
+                          />
+                          <Button onClick={() => addItem("skills", newSkill, setNewSkill)} variant="secondary">
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
 
-                              <div className="p-4 bg-white rounded-md border border-slate-200 min-h-[120px]">
-                                {isEditing ? (
-                                  <div className="flex flex-wrap gap-2">
-                                    {updateProfile.skills.map((skill, index) => (
-                                      <SkillBadge
-                                        key={skill}
-                                        skill={skill}
-                                        onRemove={() => removeItem("skills", index)}
-                                        isEditing={true}
-                                      />
-                                    ))}
+                    <div>
+                      <Label className="text-sm font-medium">Languages</Label>
+                      <div className="flex flex-wrap gap-2 mt-2 min-h-[40px] p-3 border rounded-lg bg-slate-50">
+                        {updateProfile.languages.length > 0 ? (
+                          updateProfile.languages.map((lang, index) => (
+                            <SkillBadge
+                              key={lang}
+                              skill={lang}
+                              onRemove={() => removeItem("languages", index)}
+                              isEditing={isEditing}
+                            />
+                          ))
+                        ) : (
+                          <span className="text-sm text-muted-foreground italic">No languages added yet</span>
+                        )}
+                      </div>
+                      {isEditing && (
+                        <div className="flex gap-2 mt-3">
+                          <Input
+                            value={newLanguage}
+                            onChange={(e) => setNewLanguage(e.target.value)}
+                            placeholder="Add a language (e.g., English, Spanish)"
+                            onKeyPress={(e) => {
+                              if (e.key === "Enter") {
+                                addItem("languages", newLanguage, setNewLanguage)
+                              }
+                            }}
+                          />
+                          <Button onClick={() => addItem("languages", newLanguage, setNewLanguage)} variant="secondary">
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </TabsContent>
 
-                                    <div className="flex gap-2 mt-2">
-                                      <Input
-                                        id="newSkill"
-                                        value={newSkill}
-                                        onChange={(e) => setNewSkill(e.target.value)}
-                                        placeholder="Add a skill"
-                                        className="w-40 border-slate-200 focus:border-primary focus:ring-primary/20"
-                                      />
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => addItem("skills", newSkill, setNewSkill)}
-                                        className="border-primary/20 text-primary hover:bg-primary/5"
-                                      >
-                                        <Plus className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <div className="flex flex-wrap gap-2">
-                                    {profile?.freelancerProfile?.skills?.length > 0 ? (
-                                      profile?.freelancerProfile?.skills.map((skill) => (
-                                        <SkillBadge key={skill} skill={skill} />
-                                      ))
-                                    ) : (
-                                      <p className="text-slate-500 italic">No skills added yet.</p>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label
-                                htmlFor="hourlyRate"
-                                className="text-sm font-medium text-slate-700 flex items-center gap-1.5"
-                              >
-                                <Wallet01Icon className="h-4 w-4 text-primary" />
-                                Hourly Rate
-                              </Label>
-                              {isEditing ? (
-                                <div className="relative">
-                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
-                                  <Input
-                                    id="hourlyRate"
-                                    name="hourlyRate"
-                                    type="number"
-                                    value={updateProfile.hourlyRate}
-                                    onChange={handleUpdateProfile}
-                                    className="pl-8 border-slate-200 focus:border-primary focus:ring-primary/20"
-                                  />
-                                </div>
-                              ) : (
-                                <div className="p-2.5 bg-white rounded-md border border-slate-200 text-slate-700">
-                                  ${profile?.freelancerProfile?.hourlyRate || 0}/hr
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="space-y-6">
-                            <div className="space-y-2">
-                              <Label
-                                htmlFor="availability"
-                                className="text-sm font-medium text-slate-700 flex items-center gap-1.5"
-                              >
-                                <Clock className="h-4 w-4 text-primary" />
-                                Availability
-                              </Label>
-                              {isEditing ? (
-                                <Input
-                                  id="availability"
-                                  name="availability"
-                                  value={updateProfile.availability}
-                                  onChange={handleUpdateProfile}
-                                  className="border-slate-200 focus:border-primary focus:ring-primary/20"
-                                  placeholder="e.g. Full-time, 40hrs/week"
-                                />
-                              ) : (
-                                <div className="p-2.5 bg-white rounded-md border border-slate-200 text-slate-700">
-                                  {profile?.freelancerProfile?.availability || "Not specified"}
-                                </div>
-                              )}
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label
-                                htmlFor="languages"
-                                className="text-sm font-medium text-slate-700 flex items-center gap-1.5"
-                              >
-                                <Globe02Icon className="h-4 w-4 text-primary" />
-                                Languages
-                              </Label>
-                              <div className="p-4 bg-white rounded-md border border-slate-200 min-h-[120px]">
-                                {isEditing ? (
-                                  <div className="flex flex-wrap gap-2">
-                                    {updateProfile.languages.map((language, index) => (
-                                      <SkillBadge
-                                        key={language}
-                                        skill={language}
-                                        onRemove={() => removeItem("languages", index)}
-                                        isEditing={true}
-                                      />
-                                    ))}
-
-                                    <div className="flex gap-2 mt-2">
-                                      <Input
-                                        id="newLanguage"
-                                        value={newLanguage}
-                                        onChange={(e) => setNewLanguage(e.target.value)}
-                                        placeholder="Add a language"
-                                        className="w-40 border-slate-200 focus:border-primary focus:ring-primary/20"
-                                      />
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => addItem("languages", newLanguage, setNewLanguage)}
-                                        className="border-primary/20 text-primary hover:bg-primary/5"
-                                      >
-                                        <Plus className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <div className="flex flex-wrap gap-2">
-                                    {profile?.freelancerProfile?.languages?.length > 0 ? (
-                                      profile.freelancerProfile.languages.map((language) => (
-                                        <SkillBadge key={language} skill={language} />
-                                      ))
-                                    ) : (
-                                      <p className="text-slate-500 italic">No languages added yet.</p>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
+                  {/* Professional Tab */}
+                  <TabsContent value="professional" className="mt-0 space-y-6">
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 text-foreground">Professional Details</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="hourlyRate" className="text-sm font-medium">
+                            Hourly Rate (₹)
+                          </Label>
+                          <Input
+                            id="hourlyRate"
+                            name="hourlyRate"
+                            type="number"
+                            value={updateProfile.hourlyRate}
+                            onChange={handleUpdateProfile}
+                            disabled={!isEditing}
+                            placeholder="e.g., 500"
+                            className="mt-1.5"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="availability" className="text-sm font-medium">
+                            Availability
+                          </Label>
+                          <Input
+                            id="availability"
+                            name="availability"
+                            value={updateProfile.availability}
+                            onChange={handleUpdateProfile}
+                            disabled={!isEditing}
+                            placeholder="e.g., Full-time, Part-time"
+                            className="mt-1.5"
+                          />
                         </div>
                       </div>
-                    </TabsContent>
+                    </div>
 
-                    <TabsContent value="experience" className="mt-0">
-                      <div>
-                        <CardTitle className="mb-6 flex items-center gap-2 text-slate-900">
-                          <Award className="h-5 w-5 text-primary" />
-                          Experience & Education
-                        </CardTitle>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                          <div className="space-y-2">
-                            <Label
-                              htmlFor="experience"
-                              className="text-sm font-medium text-slate-700 flex items-center gap-1.5"
-                            >
-                              <Briefcase05Icon className="h-4 w-4 text-primary" />
-                              Professional Experience
-                            </Label>
-                            {isEditing ? (
-                              <Textarea
-                                id="experience"
-                                name="experience"
-                                value={updateProfile.experience}
-                                onChange={handleUpdateProfile}
-                                className="min-h-[200px] border-slate-200 focus:border-primary focus:ring-primary/20"
-                                placeholder="Describe your professional experience..."
+                    <div>
+                      <Label className="text-sm font-medium">Skill Proficiency</Label>
+                      <div className="space-y-3 mt-3">
+                        {updateProfile.skills.slice(0, 5).map((skill, index) => (
+                          <div key={skill} className="bg-slate-50 rounded-lg p-4 border">
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="font-medium text-sm text-foreground">{skill}</span>
+                              <span className="text-xs text-muted-foreground font-medium px-2 py-1 bg-white rounded-md border">
+                                {index === 0
+                                  ? "Expert"
+                                  : index === 1
+                                    ? "Advanced"
+                                    : index === 2
+                                      ? "Intermediate"
+                                      : "Beginner"}
+                              </span>
+                            </div>
+                            <div className="w-full bg-slate-200 rounded-full h-2">
+                              <div
+                                className="bg-gradient-to-r from-primary to-indigo-600 h-2 rounded-full transition-all duration-500"
+                                style={{
+                                  width: index === 0 ? "95%" : index === 1 ? "85%" : index === 2 ? "70%" : "55%",
+                                }}
                               />
-                            ) : (
-                              <div className="p-4 bg-white rounded-md border border-slate-200 text-slate-700 min-h-[200px]">
-                                {profile?.freelancerProfile?.experience ? (
-                                  <div className="whitespace-pre-line">{profile.freelancerProfile.experience}</div>
-                                ) : (
-                                  <p className="text-slate-500 italic">No experience added yet.</p>
-                                )}
-                              </div>
-                            )}
+                            </div>
                           </div>
+                        ))}
+                        {updateProfile.skills.length === 0 && (
+                          <p className="text-sm text-muted-foreground italic p-4 bg-slate-50 rounded-lg text-center">
+                            No skills added yet. Add skills in the Personal tab.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </TabsContent>
 
-                          <div className="space-y-2">
-                            <Label
-                              htmlFor="education"
-                              className="text-sm font-medium text-slate-700 flex items-center gap-1.5"
-                            >
-                              <Mortarboard01Icon className="h-4 w-4 text-primary" />
-                              Education
-                            </Label>
-                            {isEditing ? (
-                              <Textarea
-                                id="education"
-                                name="education"
-                                value={updateProfile.education}
-                                onChange={handleUpdateProfile}
-                                className="min-h-[200px] border-slate-200 focus:border-primary focus:ring-primary/20"
-                                placeholder="Describe your educational background..."
-                              />
-                            ) : (
-                              <div className="p-4 bg-white rounded-md border border-slate-200 text-slate-700 min-h-[200px]">
-                                {profile?.freelancerProfile?.education ? (
-                                  <div className="whitespace-pre-line">{profile.freelancerProfile.education}</div>
-                                ) : (
-                                  <p className="text-slate-500 italic">No education added yet.</p>
-                                )}
-                              </div>
-                            )}
-                          </div>
+                  {/* Experience Tab */}
+                  <TabsContent value="experience" className="mt-0 space-y-6">
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 text-foreground">Experience & Education</h3>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="experience" className="text-sm font-medium">
+                            Professional Experience
+                          </Label>
+                          <Textarea
+                            id="experience"
+                            name="experience"
+                            value={updateProfile.experience}
+                            onChange={handleUpdateProfile}
+                            rows={8}
+                            disabled={!isEditing}
+                            className="mt-1.5"
+                            placeholder="Describe your work experience, projects, and achievements..."
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="education" className="text-sm font-medium">
+                            Education
+                          </Label>
+                          <Textarea
+                            id="education"
+                            name="education"
+                            value={updateProfile.education}
+                            onChange={handleUpdateProfile}
+                            rows={6}
+                            disabled={!isEditing}
+                            className="mt-1.5"
+                            placeholder="List your educational background, degrees, and certifications..."
+                          />
                         </div>
                       </div>
-                    </TabsContent>
+                    </div>
+                  </TabsContent>
 
-                    <TabsContent value="portfolio" className="mt-0">
-                      <div>
-                        <CardTitle className="mb-6 flex items-center gap-2 text-slate-900">
-                          <Link className="h-5 w-5 text-primary" />
-                          Portfolio
-                        </CardTitle>
+                  {/* Portfolio Tab */}
+                  <TabsContent value="portfolio" className="mt-0 space-y-6">
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 text-foreground">Portfolio</h3>
 
-                        <div className="space-y-6">
-                          <div className="space-y-2">
-                            <Label
-                              htmlFor="portfolio"
-                              className="text-sm font-medium text-slate-700 flex items-center gap-1.5"
-                            >
-                              <File01Icon className="h-4 w-4 text-primary" />
-                              Portfolio Items
-                            </Label>
-                            <div className="p-4 bg-white rounded-md border border-slate-200 min-h-[120px]">
-                              {isEditing ? (
-                                <div className="flex flex-wrap gap-2">
-                                  {updateProfile.portfolio.map((item, index) => (
-                                    <SkillBadge
-                                      key={item}
-                                      skill={item}
-                                      onRemove={() => removeItem("portfolio", index)}
-                                      isEditing={true}
-                                    />
-                                  ))}
-
-                                  <div className="flex gap-2 mt-2">
-                                    <Input
-                                      id="newPortfolioItem"
-                                      value={newPortfolioItem}
-                                      onChange={(e) => setNewPortfolioItem(e.target.value)}
-                                      placeholder="Add portfolio item URL"
-                                      className="w-64 border-slate-200 focus:border-primary focus:ring-primary/20"
-                                    />
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => addItem("portfolio", newPortfolioItem, setNewPortfolioItem)}
-                                      className="border-primary/20 text-primary hover:bg-primary/5"
-                                    >
-                                      <Plus className="h-4 w-4" />
-                                    </Button>
+                      {updateProfile.portfolio.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {updateProfile.portfolio.map((item, index) => (
+                            <div key={item} className="relative group">
+                              <a
+                                href={item.startsWith("http") ? item : `https://${item}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block"
+                              >
+                                <div className="bg-slate-50 border rounded-xl overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+                                  <div className="h-40 bg-gradient-to-br from-primary/10 to-indigo-600/10 flex items-center justify-center">
+                                    <HugeLink01Icon className="h-10 w-10 text-primary/40" />
+                                  </div>
+                                  <div className="p-4">
+                                    <div className="flex items-center justify-between">
+                                      <h4 className="font-medium text-sm text-foreground truncate max-w-[200px]">
+                                        {item.replace(/^https?:\/\//, "").split("/")[0]}
+                                      </h4>
+                                      <ExternalLink className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                                    </div>
                                   </div>
                                 </div>
-                              ) : (
-                                <div className="flex flex-wrap gap-2">
-                                  {profile?.freelancerProfile?.portfolio?.length > 0 ? (
-                                    profile?.freelancerProfile?.portfolio.map((item) => (
-                                      <a
-                                        key={item}
-                                        href={item.startsWith("http") ? item : `https://${item}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                      >
-                                        <Badge
-                                          variant="outline"
-                                          className="px-3 py-1 flex items-center gap-1 hover:bg-primary/5 transition-colors"
-                                        >
-                                          <Link className="h-3 w-3" />
-                                          {item}
-                                          <ExternalLink className="h-3 w-3 ml-1" />
-                                        </Badge>
-                                      </a>
-                                    ))
-                                  ) : (
-                                    <p className="text-slate-500 italic">No portfolio items added yet.</p>
-                                  )}
-                                </div>
+                              </a>
+
+                              {isEditing && (
+                                <Button
+                                  variant="destructive"
+                                  size="icon"
+                                  className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={() => removeItem("portfolio", index)}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
                               )}
                             </div>
-                          </div>
-
-                          {/* Portfolio preview section */}
-                          {profile.portfolio?.length > 0 && !isEditing && (
-                            <div className="mt-8">
-                              <h3 className="text-lg font-medium text-slate-900 mb-4 flex items-center gap-2">
-                                <Sparkles className="h-4 w-4 text-primary" />
-                                Portfolio Preview
-                              </h3>
-
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {profile.portfolio.slice(0, 3).map((item) => (
-                                  <a
-                                    key={item}
-                                    href={item.startsWith("http") ? item : `https://${item}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="block hover:-translate-y-1 hover:shadow-md transition-all"
-                                  >
-                                    <div className="bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm">
-                                      <div className="h-40 bg-slate-100 flex items-center justify-center">
-                                        <div className="text-slate-400">
-                                          <Link className="h-10 w-10" />
-                                        </div>
-                                      </div>
-                                      <div className="p-4">
-                                        <div className="flex items-center justify-between">
-                                          <h4 className="font-medium text-slate-900 truncate">
-                                            {item.replace(/^https?:\/\//, "").split("/")[0]}
-                                          </h4>
-                                          <ExternalLink className="h-4 w-4 text-slate-400" />
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </a>
-                                ))}
-                              </div>
-                            </div>
-                          )}
+                          ))}
                         </div>
-                      </div>
-                    </TabsContent>
-                  </div>
+                      ) : (
+                        <div className="p-8 bg-slate-50 rounded-lg text-center border-2 border-dashed">
+                          <HugeLink01Icon className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                          <p className="text-sm text-muted-foreground italic">
+                            No portfolio items added yet. Add your projects below.
+                          </p>
+                        </div>
+                      )}
+
+                      {isEditing && (
+                        <div className="mt-4">
+                          <Label htmlFor="portfolio" className="text-sm font-medium">
+                            Add Portfolio Link
+                          </Label>
+                          <div className="flex gap-2 mt-2">
+                            <Input
+                              id="portfolio"
+                              value={newPortfolioItem}
+                              onChange={(e) => setNewPortfolioItem(e.target.value)}
+                              placeholder="https://your-project.com"
+                              onKeyPress={(e) => {
+                                if (e.key === "Enter") {
+                                  addItem("portfolio", newPortfolioItem, setNewPortfolioItem)
+                                }
+                              }}
+                            />
+                            <Button
+                              onClick={() => addItem("portfolio", newPortfolioItem, setNewPortfolioItem)}
+                              variant="secondary"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </TabsContent>
                 </Tabs>
-              </div>
-
-              {/* Call to action */}
-              <div className="mt-10">
-                <div className="flex justify-center">
-                  <Button
-                    size="lg"
-                    className="py-2 px-4 bg-emerald-600 rounded-xl shadow-md border border-[#89AC46]/70 text-white hover:bg-[#6F8D39] font-semibold"
-                    onClick={() => setIsPublicProfileOpen(true)}
-                  >
-                    <span className="relative z-10 flex items-center">View Public Profile</span>
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
 
-      {/* Public Profile Card Modal */}
+      {/* Public Profile Preview Modal */}
       <PublicProfileCard profile={profile} isOpen={isPublicProfileOpen} setIsOpen={setIsPublicProfileOpen} />
     </div>
   )

@@ -433,14 +433,9 @@ const JobDetails = () => {
                             </div>
 
                             <TabsContent value="description" className="p-6 space-y-6 m-0">
-                                <div
-                                    className="prose dark:prose-invert max-w-none"
-                                    dangerouslySetInnerHTML={{
-                                        __html: (jobDetails.detailDesc || job.description)?.replace(/\n/g, "<br />")
-                                    }}
-                                />
-
-
+                                <div className="prose dark:prose-invert max-w-none whitespace-pre-line">
+                                    {(jobDetails.detailDesc || job.description)?.replace(/\\n/g, "\n")}
+                                </div>
                                 <div>
                                     <h3 className="text-lg font-semibold mb-3">Benefits</h3>
                                     <ul className="space-y-2">
@@ -673,7 +668,7 @@ const JobDetails = () => {
                             <div className="grid grid-cols-2 gap-3 text-sm">
                                 <div className="flex items-center gap-2">
                                     <Mail01Icon className="h-4 w-4 text-muted-foreground" />
-                                    <a href={`mailto:${jobDetails.clientInfo.email}`} className="hover:text-blue-500">{jobDetails.clientInfo.email || job.companyInfo.employees}</a>
+                                    <a href={`mailto:${jobDetails.clientInfo.email}`} className="hover:text-blue-500 truncate">{jobDetails.clientInfo.email || job.companyInfo.employees}</a>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Rss className="h-4 w-4 text-muted-foreground" />
