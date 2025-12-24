@@ -15,7 +15,10 @@ import Scroler from './Scroller'
 import TrendingServices from './TrendingServices'
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
+import CTASection from '../../Components/Footer/CTASection'
+import { useNavigate } from 'react-router-dom'
 const Home = () => {
+    const navigate = useNavigate();
     const [mounted, setMounted] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
     const [selectedCategory, setSelectedCategory] = useState("")
@@ -126,6 +129,7 @@ const Home = () => {
 
                                             <Button
                                                 type="submit"
+                                                onClick={()=> navigate('/jobs')}
                                                 className="w-full md:w-auto py-6 px-8 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-full shadow-lg text-white font-medium text-base transition-all duration-300 hover:shadow-emerald-200/50 hover:shadow-xl"
                                             >
                                                 <span>Search</span>
@@ -269,8 +273,11 @@ const Home = () => {
             <section className="mx-4 py-2 md:mx-16 rounded-md md:py-12 bg-gray-100">
                 <Scroler />
             </section>
-            <section className="px-4 py-2 md:px-16 md:py-12">
+            {/* <section className="px-4 py-2 md:px-16 md:py-12">
                 <TrendingServices />
+            </section> */}
+            <section>
+                <CTASection />
             </section>
         </div>
     )

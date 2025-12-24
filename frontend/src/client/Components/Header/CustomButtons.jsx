@@ -57,7 +57,7 @@ export default function CustomButtons() {
             {isLoggedIn ? (
                 <>
                     {role === 'freelancer' && subscription && (
-                        <>
+                        <div className='hidden md:flex'>
                             {subscription?.activePlan  === 'Basic' && (
                                 <Button
                                     className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 flex gap-2 rounded-md"
@@ -85,7 +85,7 @@ export default function CustomButtons() {
                                     <span className="sr-only">Current Plan</span>
                                 </Button>
                             )}
-                        </>
+                        </div>
                     )}
 
                     <Button variant="ghost" size="icon">
@@ -129,7 +129,7 @@ export default function CustomButtons() {
                         <Link to="/login">Login</Link>
                     </Button>
                     <Button onClick={handleLogin} asChild className="py-2 px-4 bg-emerald-600 rounded-xl shadow-md border border-emerald-600/70 text-white hover:bg-[#6F8D39] font-semibold">
-                        <Link to="/signup">Signup</Link>
+                        <Link to="/signup">Get Started</Link>
                     </Button>
                 </div>
             )}

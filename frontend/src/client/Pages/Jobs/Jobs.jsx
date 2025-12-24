@@ -1,5 +1,3 @@
-
-
 import { getJobs } from "@/client/Redux/Actions/jobActions"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -91,6 +89,8 @@ export default function Jobs() {
   const [budgetRange, setBudgetRange] = useState([500, 5000])
   const [showMobileFilters, setShowMobileFilters] = useState(false)
   const [selectedSkills, setSelectedSkills] = useState([])
+  const [selectedJobTypes, setSelectedJobTypes] = useState([])
+  const [selectedExperienceLevels, setSelectedExperienceLevels] = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [placeholderIndex, setPlaceholderIndex] = useState(0)
   const navigate = useNavigate()
@@ -158,26 +158,48 @@ export default function Jobs() {
 
 
   // Filter jobs based on search term, selected skills, and active filters
-  const filteredJobs = jobs.filter((job) => {
-    // Search term filter
+  const filteredJobs = jobs
+  .filter((job) => {
+    const search = searchTerm.toLowerCase();
+
     const matchesSearch =
-      job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.category.toLowerCase().includes(searchTerm.toLowerCase())
+      job.title?.toLowerCase().includes(search) ||
+      job.category?.toLowerCase().includes(search) ||
+      job.skills?.some((skill) => skill.toLowerCase().includes(search));
 
-
-    // Skills filter
     const matchesSkills =
-      selectedSkills.length === 0 || (job.skills && selectedSkills.some((skill) => job.skills.includes(skill)))
+      selectedSkills.length === 0 ||
+      (job.skills &&
+        selectedSkills.some((skill) =>
+          job.skills.includes(skill)
+        ));
+
     const matchesJobType =
-      activeFilters.length === 0 || (job.jobType && activeFilters.includes(job.jobType));
+      selectedJobTypes.length === 0 ||
+      (job.jobType &&
+        selectedJobTypes.includes(job.jobType));
+
     const matchesExperienceLevel =
-    activeFilters.length === 0 || (job.experienceLevel && activeFilters.includes(job.experienceLevel));
-    // We're not implementing all filters since we don't have that data in the job objects
-    // but this shows how it would work
+      selectedExperienceLevels.length === 0 ||
+      (job.experienceLevel &&
+        selectedExperienceLevels.includes(job.experienceLevel));
+
+    const matchesLocation =
+      activeFilters.length === 0 ||
+      (job.location &&
+        activeFilters.includes(job.location));
 
 
-    return matchesSearch && matchesSkills && matchesJobType && matchesExperienceLevel;
-  }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    return (
+      matchesSearch &&
+      matchesSkills &&
+      matchesJobType &&
+      matchesExperienceLevel &&
+      matchesLocation
+    );
+  })
+  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
   const filteredSuggestions = jobs
   .flatMap((job) => [job.title, job.category, ...(job.skills || [])]) // Collect job titles, categories, and skills
   .filter((item, index, arr) => arr.indexOf(item) === index) // Remove duplicates
@@ -423,7 +445,7 @@ export default function Jobs() {
                   <ChevronDown className="h-4 w-4 transition-transform duration-200 ui-open:rotate-180" />
                 </CollapsibleTrigger>
                 <CollapsibleContent className="pt-2 space-y-2">
-                  {["Remote only", "On-site", "Hybrid"].map((location) => (
+                  {["Remote", "On-site", "Hybrid"].map((location) => (
                     <div key={location} className="flex items-center space-x-2">
                       <Checkbox
                         id={`location-${location}`}
@@ -616,7 +638,7 @@ export default function Jobs() {
                         <span>Location</span>
                       </h3>
                       <div className="space-y-2">
-                        {["Remote only", "On-site", "Hybrid"].map((location) => (
+                        {["Remote", "On-site", "Hybrid"].map((location) => (
                           <div key={location} className="flex items-center space-x-2">
                             <Checkbox
                               id={`mobile-location-${location}`}

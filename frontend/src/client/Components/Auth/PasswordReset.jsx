@@ -138,7 +138,7 @@ export default function PasswordResetPage() {
       </div> */}
 
       {/* Main content */}
-      <div className="relative z-10 w-full max-w-md mx-4">
+      <div className="relative z-10 w-full max-w-lg mx-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

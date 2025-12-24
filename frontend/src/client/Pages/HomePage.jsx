@@ -71,7 +71,7 @@ const HomePage = () => {
                 <Route path="*" element={<NotFound />} />
 
             </Routes>
-            {/* <Footer /> */}
+            <Footer />
         </DataProvider>
     )
 }

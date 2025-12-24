@@ -8,16 +8,16 @@ import CustomButtons from "./CustomButtons"
 import { ArrowDown01Icon } from "hugeicons-react"
 import Logo from "@/assets/logos/Logo.png"
 const navItems = [
-    {
-        title: "Browse Jobs",
-        items: [
-            { name: "All Jobs", route: "/jobs" },
-            { name: "Remote Jobs", route: "/jobs/remote" },
-            { name: "Full-time Jobs", route: "/jobs/full-time" },
-            { name: "Part-time Jobs", route: "/jobs/part-time" },
-            { name: "Freelance Jobs", route: "/jobs/freelance" },
-        ],
-    },
+    // {
+    //     title: "Browse Jobs",
+    //     items: [
+    //         { name: "All Jobs", route: "/jobs" },
+    //         { name: "Remote Jobs", route: "/jobs/remote" },
+    //         { name: "Full-time Jobs", route: "/jobs/full-time" },
+    //         { name: "Part-time Jobs", route: "/jobs/part-time" },
+    //         { name: "Freelance Jobs", route: "/jobs/freelance" },
+    //     ],
+    // },
     {
         title: "Find Talent",
         items: [
@@ -71,6 +71,9 @@ const Navbar = () => {
                 <nav className="hidden lg:flex items-center justify-center space-x-6">
                     <Link className="text-md font-medium" to="/">
                         Home
+                    </Link>
+                    <Link className="text-md font-medium" to="/jobs">
+                        Find work
                     </Link>
                     {navItems.map((item, index) => (
                         <div
