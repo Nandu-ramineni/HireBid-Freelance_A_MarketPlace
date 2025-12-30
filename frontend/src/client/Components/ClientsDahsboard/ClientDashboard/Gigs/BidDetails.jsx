@@ -63,7 +63,8 @@ const BidDetails = () => {
   }
   
   const acceptedBid = bidDetails?.bids?.find(b => b.bid.status === "accepted");
-  const completedBid = bidDetails?.bids?.filter(b => b.bid.status === "completed");
+  const completedBid = bidDetails?.bids?.find(b => b.bid.status === "completed");
+
 
 
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US", {
