@@ -346,3 +346,23 @@ export const updateUserStatus = async (req, res) => {
         });
     }
 };
+
+export const deleteUser = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const response = await axios.delete(
+            `http://localhost:5000/api/auth/delete-user/${userId}`
+        );
+        res.status(200).json({
+            success: true,
+            message: "User deleted successfully",
+            data: response.data
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Error while deleting user",
+            error: error.message
+        });
+    }   
+};
