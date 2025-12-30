@@ -3,52 +3,62 @@ import Bid from "../Models/Bid.js"
 import Job from "../Models/Job.js";
 import { sendBidAcceptedEmail } from "../Utils/nodemailerConfig.js";
 
-
 export const placeBid = async (req, res) => {
     const { jobId, amount, message } = req.body;
     const { userId } = req.user;
     const token = req.headers.authorization;
 
     try {
-        const { data: subscriptionData } = await axios.get('http://localhost:5000/api/subscription/userSubscriptions', {
-            headers: {
-                Authorization: token,
-            },
-        });
+        const { data: subscriptionData } = await axios.get(
+            "http://localhost:5000/api/subscription/userSubscriptions",
+            {
+                headers: { Authorization: token },
+            }
+        );
 
-        if (!subscriptionData || !subscriptionData.subscriptions || subscriptionData.subscriptions.length === 0) {
-            return res.status(404).json({ message: 'Subscription details not found' });
+        console.log("Subscription Data:", subscriptionData);
+
+        const activePlan = subscriptionData?.activePlan; // 👈 now using correct field
+
+        if (!activePlan) {
+            return res.status(404).json({ message: "Subscription details not found" });
         }
 
-        const userPlan = subscriptionData.subscriptions.filter(sub =>
-            (sub.plan === 'premium' || sub.plan === 'enterprise') &&
-            sub.status === 'active'
-        );
+        const isPremiumUser =
+            activePlan.toLowerCase() === "premium" ||
+            activePlan.toLowerCase() === "enterprise";
 
         const job = await Job.findById(jobId);
         if (!job) {
-            return res.status(404).json({ message: 'Gig not found' });
+            return res.status(404).json({ message: "Gig not found" });
         }
 
         if (job.clientId.toString() === userId) {
-            return res.status(400).json({ message: 'You cannot bid on your own Gig' });
+            return res.status(400).json({ message: "You cannot bid on your own Gig" });
         }
 
         if (job.budget < amount) {
-            return res.status(400).json({ message: 'Bid amount cannot be greater than Gig budget' });
+            return res.status(400).json({ message: "Bid amount cannot be greater than Gig budget" });
         }
 
-        if (job.budget > 20000 && !userPlan) {
-            return res.status(400).json({ message: 'Please upgrade your subscription to bid on high-budget Gigs' });
+        // 👇 restrict high-budget gigs
+        if (job.budget > 20000 && !isPremiumUser) {
+            return res.status(400).json({
+                message: "Please upgrade your subscription to bid on high-budget Gigs",
+            });
         }
 
-        if (job.status === 'in-progress' || job.status === 'completed') {
+        if (job.status === "in-progress" || job.status === "completed") {
             return res.status(400).json({ message: `Job is ${job.status}` });
         }
 
-        const existingBid = await Bid.findOne({ jobId, freelancerId: userId });
+        const existingBid = await Bid.findOne({
+            jobId,
+            freelancerId: userId,
+        });
+
         if (existingBid) {
-            return res.status(400).json({ message: 'You have already placed a bid on this Gig' });
+            return res.status(400).json({ message: "You have already placed a bid on this Gig" });
         }
 
         const newBid = new Bid({
@@ -60,14 +70,18 @@ export const placeBid = async (req, res) => {
         });
 
         await newBid.save();
+
         job.proposals = (Number(job.proposals) || 0) + 1;
         await job.save();
-        res.status(201).json({ message: 'Bid placed successfully', bid: newBid });
+
+        return res.status(201).json({ message: "Bid placed successfully", bid: newBid });
 
     } catch (error) {
-        res.status(500).json({ message: 'Error while placing bid', error: error.message });
+        console.error("Place bid error:", error);
+        return res.status(500).json({ message: "Error while placing bid", error: error.message });
     }
 };
+
 
 export const acceptBid = async (req, res) => {
     const { bidId } = req.params;

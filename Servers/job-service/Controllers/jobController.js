@@ -109,7 +109,7 @@ export const getJobById = async (req, res) => {
         let client = null;
         try {
             const userResponse = await axios.get("http://localhost:5000/api/auth/users");
-            const users = userResponse.data;
+            const users = userResponse.data.filteredUsers;
             client = users.find(user => user._id.toString() === job.clientId.toString());
         } catch (userFetchError) {
             console.error("Error fetching users:", userFetchError.message);
@@ -237,20 +237,28 @@ export const unsaveJobByFreelancer = async (req, res) => {
 };
 
 export const getClientGigs = async (req, res) => {
-    const { userId } = req.user;
-    try {
-        const job = await Job.find({ clientId: userId });
-        if (!job || job.length === 0) {
-            res.status(404).json({ message: 'No gigs found for this client' });
-        }
-        return res.status(200).json(job);
-    } catch (error) {
-        return res.status(500).json({
-            message: 'Error while fetching client gigs',
-            error: error.message,
-        });
+  const { userId } = req.user;
+
+  try {
+    const jobs = await Job.find({ clientId: userId });
+
+    if (!jobs || jobs.length === 0) {
+      return res.status(404).json({
+        message: "No gigs found for this client",
+      });
     }
-}
+
+    return res.status(200).json(jobs);
+  } catch (error) {
+    console.error("Error fetching client gigs:", error);
+
+    return res.status(500).json({
+      message: "Error while fetching client gigs",
+      error: error.message,
+    });
+  }
+};
+
 
 
 export const generateReportForClient = async (req, res) => {
