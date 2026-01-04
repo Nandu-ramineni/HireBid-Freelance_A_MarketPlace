@@ -51,7 +51,7 @@ export default function TopBar() {
                         </div>
 
                         {/* Support Email */}
-                        <div className="flex items-center gap-2 group hidden sm:flex">
+                        <div className="items-center gap-2 group hidden sm:flex">
                             <div className="p-1 bg-purple-100 dark:bg-purple-900/30 rounded-full">
                                 <Mail className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
                             </div>
