@@ -100,6 +100,15 @@ export default function CreateGig() {
         "Video Editing",
         "Content Writing",
         "Digital Marketing",
+        "Graphic Design",
+        "Customer Support",
+        "Sales & Business Development",
+        "DevOps & Cloud Engineering",
+        "AI & Machine Learning",
+        "Blockchain Development",
+        "Cloud Computing",
+        "Game Development",
+        "IT & Network Administration",
     ]
 
     const jobTypes = ["Full Time", "Part Time", "Contract", "Freelance"]

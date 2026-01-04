@@ -87,7 +87,6 @@ export default function Jobs() {
   const { jobs, loading, error } = useSelector((state) => state.getJobs)
   const [searchTerm, setSearchTerm] = useState("")
   const [activeFilters, setActiveFilters] = useState([])
-  const [budgetRange, setBudgetRange] = useState([500, 5000])
   const [showMobileFilters, setShowMobileFilters] = useState(false)
   const [selectedSkills, setSelectedSkills] = useState([])
   const [selectedJobTypes, setSelectedJobTypes] = useState([])
@@ -102,6 +101,37 @@ export default function Jobs() {
     "Search by Gig keywords...",
     "Search by Gig budget...",
   ]
+  const [selectedCategories, setSelectedCategories] = useState([])
+const [selectedLocations, setSelectedLocations] = useState([])
+const [selectedDurations, setSelectedDurations] = useState([])
+const [budgetRange, setBudgetRange] = useState([0, 200000])
+const [budgetMax, setBudgetMax] = useState(200000)
+
+// normalize "Web Development" -> "web-development"
+const slugify = (s = "") => s.toLowerCase().trim().replace(/\s+/g, "-")
+
+const toggleFromList = (list, setList, value) => {
+  setList((prev) => (prev.includes(value) ? prev.filter((x) => x !== value) : [...prev, value]))
+}
+
+const clearAllFilters = () => {
+  setSearchTerm("")
+  setShowSuggestions(false)
+
+  setSelectedSkills([])
+  setSelectedJobTypes([])
+  setSelectedExperienceLevels([])
+  setSelectedCategories([])
+  setSelectedLocations([])
+  setSelectedDurations([])
+
+  setActiveFilters([])
+
+  // IMPORTANT: reset to full dynamic budget range
+  setBudgetRange([0, budgetMax])
+}
+
+
   const tagStyles = [
     {
       text: { light: "#5925DC", dark: "#BDB4FE" },
@@ -127,6 +157,13 @@ export default function Jobs() {
       hoverBg: { light: "#026AA20D", dark: "#7CD4FD0D" },
     },
   ]
+  useEffect(() => {
+  if (!jobs || jobs.length === 0) return
+
+  const max = Math.max(...jobs.map((j) => Number(j.budget || 0)), 200000)
+  setBudgetMax(max)
+  setBudgetRange([0, max]) // default: show all jobs
+}, [jobs])
 
   useEffect(() => {
     dispatch(getJobs())
@@ -146,66 +183,102 @@ export default function Jobs() {
   }
 
   const removeFilter = (filter) => {
-    setActiveFilters(activeFilters.filter((f) => f !== filter))
-  }
+  // categories are slugified (web-development, cloud-services...)
+  setSelectedCategories((prev) => prev.filter((x) => x !== filter))
+
+  // skills are lowercased
+  setSelectedSkills((prev) => prev.filter((x) => x !== filter))
+
+  setSelectedJobTypes((prev) => prev.filter((x) => x !== filter))
+  setSelectedExperienceLevels((prev) => prev.filter((x) => x !== filter))
+  setSelectedLocations((prev) => prev.filter((x) => x !== filter))
+  setSelectedDurations((prev) => prev.filter((x) => x !== filter))
+
+  // optional: keep this (but not needed since you have sync useEffect)
+  setActiveFilters((prev) => prev.filter((f) => f !== filter))
+}
+
 
   const toggleSkill = (skill) => {
-    if (selectedSkills.includes(skill)) {
-      setSelectedSkills(selectedSkills.filter((s) => s !== skill))
-    } else {
-      setSelectedSkills([...selectedSkills, skill])
-    }
+    const normalized = skill.toLowerCase()
+    setSelectedSkills((prev) =>
+      prev.includes(normalized) ? prev.filter((s) => s !== normalized) : [...prev, normalized]
+    )
   }
+
 
 
   // Filter jobs based on search term, selected skills, and active filters
-  const filteredJobs = jobs
+  const filteredJobs = (jobs || [])
   .filter((job) => {
-    const search = searchTerm.toLowerCase();
+    const search = searchTerm.toLowerCase()
 
     const matchesSearch =
+      !search ||
       job.title?.toLowerCase().includes(search) ||
       job.category?.toLowerCase().includes(search) ||
-      job.skills?.some((skill) => skill.toLowerCase().includes(search));
+      job.skills?.some((s) => s.toLowerCase().includes(search))
 
     const matchesSkills =
       selectedSkills.length === 0 ||
-      (job.skills &&
-        selectedSkills.some((skill) =>
-          job.skills.includes(skill)
-        ));
+      job.skills?.some((s) => selectedSkills.includes(s.toLowerCase()))
 
     const matchesJobType =
-      selectedJobTypes.length === 0 ||
-      (job.jobType &&
-        activeFilters.includes(job.jobType));
+      selectedJobTypes.length === 0 || selectedJobTypes.includes(job.jobType)
 
-    const matchesExperienceLevel =
+    const matchesExperience =
       selectedExperienceLevels.length === 0 ||
-      (job.experienceLevel &&
-        activeFilters.includes(job.experienceLevel));
+      selectedExperienceLevels.includes(job.experienceLevel)
 
     const matchesLocation =
-      activeFilters.length === 0 ||
-      (job.location &&
-        activeFilters.includes(job.location));
+      selectedLocations.length === 0 || selectedLocations.includes(job.location)
+
+    const matchesCategory =
+      selectedCategories.length === 0 || selectedCategories.includes(slugify(job.category))
+
+    const matchesBudget =
+      typeof job.budget !== "number" ||
+      (job.budget >= budgetRange[0] && job.budget <= budgetRange[1])
 
 
     return (
       matchesSearch &&
       matchesSkills &&
       matchesJobType &&
-      matchesExperienceLevel &&
-      matchesLocation
-    );
+      matchesExperience &&
+      matchesLocation &&
+      matchesCategory &&
+      matchesBudget
+
+    )
   })
-  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+
 
   const filteredSuggestions = jobs
   .flatMap((job) => [job.title, job.category, ...(job.skills || [])]) // Collect job titles, categories, and skills
   .filter((item, index, arr) => arr.indexOf(item) === index) // Remove duplicates
   .filter((item) => item.toLowerCase().includes(searchTerm.toLowerCase())) // Filter by search term
   .slice(0, 5); // Limit to 5 suggestions
+  useEffect(() => {
+  setActiveFilters([
+    ...selectedCategories,          // already slugified
+    ...selectedJobTypes,
+    ...selectedExperienceLevels,
+    ...selectedLocations,
+    ...selectedDurations,
+    ...selectedSkills,              // lowercased
+  ])
+}, [
+  selectedCategories,
+  selectedJobTypes,
+  selectedExperienceLevels,
+  selectedLocations,
+  selectedDurations,
+  selectedSkills,
+])
+
+
 
   if (error) {
     return (
@@ -299,7 +372,7 @@ export default function Jobs() {
               key={category.name}
               variant="outline"
               className="h-auto py-3 justify-center gap-3 hover:border-primary hover:text-primary"
-              onClick={() => addFilter(category.name)}
+              onClick={() => toggleFromList(selectedCategories, setSelectedCategories, slugify(category.name))}
             >
               <img src={category.image} alt={category.name} className="w-6 h-6" />
               <span>{category.name}</span>
@@ -332,7 +405,7 @@ export default function Jobs() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setActiveFilters([])}
+                    onClick={clearAllFilters}
                     className="h-auto p-0 text-muted-foreground hover:text-foreground"
                   >
                     Clear all
@@ -354,10 +427,8 @@ export default function Jobs() {
                     <div key={type} className="flex items-center space-x-2">
                       <Checkbox
                         id={`job-type-${type}`}
-                        checked={activeFilters.includes(type)}
-                        onCheckedChange={(checked) => {
-                          checked ? addFilter(type) : removeFilter(type)
-                        }}
+                        checked={selectedJobTypes.includes(type)}
+                        onCheckedChange={() => toggleFromList(selectedJobTypes, setSelectedJobTypes, type)}
                       />
                       <Label htmlFor={`job-type-${type}`} className="text-sm cursor-pointer">
                         {type}
@@ -381,10 +452,8 @@ export default function Jobs() {
                     <div key={level} className="flex items-center space-x-2">
                       <Checkbox
                         id={`exp-level-${level}`}
-                        checked={activeFilters.includes(level)}
-                        onCheckedChange={(checked) => {
-                          checked ? addFilter(level) : removeFilter(level)
-                        }}
+                        checked={selectedExperienceLevels.includes(level)}
+                        onCheckedChange={() => toggleFromList(selectedExperienceLevels, setSelectedExperienceLevels, level)}
                       />
                       <Label htmlFor={`exp-level-${level}`} className="text-sm cursor-pointer">
                         {level}
@@ -410,12 +479,13 @@ export default function Jobs() {
                       <span>₹{budgetRange[1]}+</span>
                     </div>
                     <Slider
-                      defaultValue={budgetRange}
-                      min={100}
-                      max={10000}
+                      value={budgetRange}
+                      min={0}
+                      max={budgetMax}
                       step={100}
                       onValueChange={(value) => setBudgetRange(value)}
                     />
+
                     <div className="flex gap-2">
                       <Input
                         type="number"
@@ -450,10 +520,8 @@ export default function Jobs() {
                       <div key={duration} className="flex items-center space-x-2">
                         <Checkbox
                           id={`duration-${duration}`}
-                          checked={activeFilters.includes(duration)}
-                          onCheckedChange={(checked) => {
-                            checked ? addFilter(duration) : removeFilter(duration)
-                          }}
+                          checked={selectedDurations.includes(duration)}
+                          onCheckedChange={() => toggleFromList(selectedDurations, setSelectedDurations, duration)}
                         />
                         <Label htmlFor={`duration-${duration}`} className="text-sm cursor-pointer">
                           {duration}
@@ -478,10 +546,8 @@ export default function Jobs() {
                     <div key={location} className="flex items-center space-x-2">
                       <Checkbox
                         id={`location-${location}`}
-                        checked={activeFilters.includes(location)}
-                        onCheckedChange={(checked) => {
-                          checked ? addFilter(location) : removeFilter(location)
-                        }}
+                        checked={selectedLocations.includes(location)}
+                        onCheckedChange={() => toggleFromList(selectedLocations, setSelectedLocations, location)}
                       />
                       <Label htmlFor={`location-${location}`} className="text-sm cursor-pointer">
                         {location}
@@ -512,7 +578,7 @@ export default function Jobs() {
                             onSelect={() => toggleSkill(skill)}
                             className="flex items-center gap-2 cursor-pointer"
                           >
-                            <Checkbox checked={selectedSkills.includes(skill)} className="h-4 w-4" />
+                            <Checkbox checked={selectedSkills.includes(skill.toLowerCase())} className="h-4 w-4" />
                             {skill}
                           </CommandItem>
                         ))}
@@ -536,7 +602,7 @@ export default function Jobs() {
                     variant="ghost"
                     size="sm"
                     onClick={() => {
-                      setActiveFilters([])
+                      clearAllFilters()
                       setShowMobileFilters(false)
                     }}
                     className="h-auto p-0 text-muted-foreground hover:text-foreground"
@@ -557,11 +623,9 @@ export default function Jobs() {
                       {["One-time project", "Ongoing work", "Full-time contract", "Part-time"].map((type) => (
                         <div key={type} className="flex items-center space-x-2">
                           <Checkbox
-                            id={`mobile-job-type-${type}`}
-                            checked={activeFilters.includes(type)}
-                            onCheckedChange={(checked) => {
-                              checked ? addFilter(type) : removeFilter(type)
-                            }}
+                            id={`job-type-${type}`}
+                            checked={selectedJobTypes.includes(type)}
+                            onCheckedChange={() => toggleFromList(selectedJobTypes, setSelectedJobTypes, type)}
                           />
                           <Label htmlFor={`mobile-job-type-${type}`} className="text-sm cursor-pointer">
                             {type}
@@ -582,7 +646,7 @@ export default function Jobs() {
                           (duration) => (
                             <div key={duration} className="flex items-center space-x-2">
                               <Checkbox
-                                id={`mobile-duration-${duration}`}
+                                id={`duration-${duration}`}
                                 checked={activeFilters.includes(duration)}
                                 onCheckedChange={(checked) => {
                                   checked ? addFilter(duration) : removeFilter(duration)
@@ -608,11 +672,9 @@ export default function Jobs() {
                         {["Entry level", "Intermediate", "Expert"].map((level) => (
                           <div key={level} className="flex items-center space-x-2">
                             <Checkbox
-                              id={`mobile-exp-level-${level}`}
-                              checked={activeFilters.includes(level)}
-                              onCheckedChange={(checked) => {
-                                checked ? addFilter(level) : removeFilter(level)
-                              }}
+                              id={`exp-level-${level}`}
+                              checked={selectedExperienceLevels.includes(level)}
+                              onCheckedChange={() => toggleFromList(selectedExperienceLevels, setSelectedExperienceLevels, level)}
                             />
                             <Label htmlFor={`mobile-exp-level-${level}`} className="text-sm cursor-pointer">
                               {level}
@@ -635,9 +697,9 @@ export default function Jobs() {
                           <span>₹{budgetRange[1]}+</span>
                         </div>
                         <Slider
-                          defaultValue={budgetRange}
-                          min={100}
-                          max={10000}
+                          value={budgetRange}
+                          min={0}
+                          max={budgetMax}
                           step={100}
                           onValueChange={(value) => setBudgetRange(value)}
                         />
@@ -670,11 +732,9 @@ export default function Jobs() {
                         {["Remote", "On-site", "Hybrid"].map((location) => (
                           <div key={location} className="flex items-center space-x-2">
                             <Checkbox
-                              id={`mobile-location-${location}`}
-                              checked={activeFilters.includes(location)}
-                              onCheckedChange={(checked) => {
-                                checked ? addFilter(location) : removeFilter(location)
-                              }}
+                              id={`location-${location}`}
+                              checked={selectedLocations.includes(location)}
+                              onCheckedChange={() => toggleFromList(selectedLocations, setSelectedLocations, location)}
                             />
                             <Label htmlFor={`mobile-location-${location}`} className="text-sm cursor-pointer">
                               {location}
@@ -702,7 +762,7 @@ export default function Jobs() {
                                 onSelect={() => toggleSkill(skill)}
                                 className="flex items-center gap-2 cursor-pointer"
                               >
-                                <Checkbox checked={selectedSkills.includes(skill)} className="h-4 w-4" />
+                                <Checkbox checked={selectedSkills.includes(skill.toLowerCase())} className="h-4 w-4" />
                                 {skill}
                               </CommandItem>
                             ))}
@@ -748,7 +808,7 @@ export default function Jobs() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setActiveFilters([])}
+                onClick={clearAllFilters}
                 className="text-xs text-muted-foreground hover:text-foreground hover:bg-white"
               >
                 Clear all

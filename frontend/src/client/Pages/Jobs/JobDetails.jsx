@@ -168,7 +168,7 @@ const JobDetails = () => {
     const { jobDetails, } = useSelector((state) => state.getJobs)
     const [jobId, setJobId] = useState(null)
     const [job, setJob] = useState(null)
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
     const [saved] = useState(false)
     const [showModal, setShowModal] = useState(false)
     const [showShareModal, setShowShareModal] = useState(false)
@@ -177,12 +177,12 @@ const JobDetails = () => {
         setJobId(id)
         dispatch(getJobById(id))
 
-        const timer = setTimeout(() => {
-            setJob(sampleJobData)
-            setLoading(false)
-        }, 10)
+        // const timer = setTimeout(() => {
+        //     setJob(sampleJobData)
+        //     setLoading(false)
+        // }, 10)
 
-        return () => clearTimeout(timer)
+        // return () => clearTimeout(timer)
     }, [dispatch])
 
     const handleApply = () => {
@@ -279,7 +279,7 @@ const JobDetails = () => {
                             <div className="flex  gap-4 md:items-center mb-6">
                                 <div className="flex-shrink-0">
                                     <img
-                                        src={jobDetails.image || "/placeholder.svg"}
+                                        src={jobDetails?.image || "/placeholder.svg"}
                                         alt={jobDetails.title}
                                         className="w-16 h-16 object-contain p-2 rounded-xl border border-[#0C0E1226]"
                                     />
@@ -656,8 +656,8 @@ const JobDetails = () => {
                         <CardContent className="space-y-4">
                             <div className="flex items-center gap-3">
                                 <img
-                                    src={jobDetails.clientInfo.profile || "/placeholder.svg"}
-                                    alt={job.company}
+                                    src={jobDetails?.clientInfo?.profile || "/placeholder.svg"}
+                                    alt={jobDetails?.clientInfo?.company}
                                     className="w-10 h-10 object-cover p-1 rounded-full border border-[#0C0E1226]"
                                 />
                                 <div>
@@ -676,11 +676,11 @@ const JobDetails = () => {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Calendar03Icon className="h-4 w-4 text-muted-foreground" />
-                                    <span>Since {found || job.companyInfo.founded}</span>
+                                    <span>Since {found || jobDetails?.companyInfo?.founded}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Briefcase05Icon className="h-4 w-4 text-muted-foreground" />
-                                    <span>{job.companyInfo.projects}+ Projects</span>
+                                    <span>{jobDetails?.companyInfo?.projects}+ Projects</span>
                                 </div>
                             </div>
                             <Button variant="outline" className="w-full">
@@ -695,7 +695,7 @@ const JobDetails = () => {
                             <CardTitle>Similar Jobs</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            {job.similarJobs.map((similarJob) => (
+                            {sampleJobData?.similarJobs.map((similarJob) => (
                                 <div key={similarJob._id} className="border-b pb-4 last:border-0 last:pb-0">
                                     <h4 className="font-medium mb-1 hover:text-primary cursor-pointer">{similarJob.title}</h4>
                                     <p className="text-sm text-muted-foreground mb-2">{similarJob.company}</p>
