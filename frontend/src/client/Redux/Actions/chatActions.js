@@ -33,5 +33,6 @@ export const getChats = (jobId) => async (dispatch) => {
         dispatch({ type: actionTypes.GET_MESSAGES_SUCCESS, payload: data });
     } catch (e) {
         dispatch({ type: actionTypes.GET_MESSAGES_FAIL, payload: e.message });
+        throw e.message;
     }
 }

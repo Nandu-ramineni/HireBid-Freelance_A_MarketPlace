@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import Cookies from 'js-cookie';
 import { Bookmark01Icon, Briefcase02Icon, Message01Icon, OfficeIcon, StarIcon, UserCircle02Icon, Wallet01Icon } from 'hugeicons-react';
-
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 const routes = [
   {
     href: '/client-dashboard',
@@ -109,11 +109,12 @@ export default function Sidebar({ isOpen, setIsOpen, client }) {
         <div className="flex items-center justify-between h-14 px-4 border-t border-gray-200">
           <div className="flex items-center space-x-2">
             <div>
-              <img
-                src={client?.profile || "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"}
-                alt=""
-                className="w-10 h-10 rounded-full"
-              />
+              <Avatar className="h-10 w-10  border-white/20 shadow-xl">
+                <AvatarImage src={client?.profile || "/placeholder.svg"} alt={client?.username} />
+                <AvatarFallback className="bg-white/20 text-2xl font-bold">
+                  {client?.clientProfile?.company?.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
             </div>
             <div>
               <p className="text-sm font-medium">{client?.clientProfile?.company || "John Doe"}</p>

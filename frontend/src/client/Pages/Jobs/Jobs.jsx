@@ -448,7 +448,7 @@ const clearAllFilters = () => {
                   <ChevronDown className="h-4 w-4 transition-transform duration-200 ui-open:rotate-180" />
                 </CollapsibleTrigger>
                 <CollapsibleContent className="pt-2 space-y-2">
-                  {["Entry level", "Intermediate", "Expert"].map((level) => (
+                  {["Entry Level", "Intermediate", "Expert"].map((level) => (
                     <div key={level} className="flex items-center space-x-2">
                       <Checkbox
                         id={`exp-level-${level}`}
@@ -669,7 +669,7 @@ const clearAllFilters = () => {
                         <span>Experience Level</span>
                       </h3>
                       <div className="space-y-2">
-                        {["Entry level", "Intermediate", "Expert"].map((level) => (
+                        {["Entry Level", "Intermediate", "Expert"].map((level) => (
                           <div key={level} className="flex items-center space-x-2">
                             <Checkbox
                               id={`exp-level-${level}`}

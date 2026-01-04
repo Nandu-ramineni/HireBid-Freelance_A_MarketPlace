@@ -119,6 +119,9 @@ const Navbar = () => {
                                 <Link className="text-sm font-medium" to="/" onClick={() => setIsMenuOpen(false)}>
                                     Home
                                 </Link>
+                                <Link className="text-sm font-medium" to="/jobs" onClick={() => setIsMenuOpen(false)}>
+                                    Find Work
+                                </Link>
                                 {navItems.map((item, index) => (
                                     <Collapsible key={index}>
                                         <CollapsibleTrigger className="flex items-center justify-between w-full text-sm font-medium">
